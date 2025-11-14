@@ -10,7 +10,6 @@ import {
   setUnreadCount,
   updateUser,
 } from "../../../redux/userSlice";
-import { getAvatarUrl } from "../../../utils/imageUtils";
 import "../../../styles/components/Navbar.css";
 
 export default function Navbar({ brandText = "SuLi Coffee" }) {
@@ -50,7 +49,10 @@ export default function Navbar({ brandText = "SuLi Coffee" }) {
           }
 
           if (avatarPath) {
-            dispatch(updateUser({ avatar: getAvatarUrl(avatarPath) }));
+            const fullUrl = avatarPath.startsWith("http")
+              ? avatarPath
+              : `http://localhost:5000${avatarPath}`;
+            dispatch(updateUser({ avatar: fullUrl }));
           }
         }
       } catch (err) {
@@ -195,11 +197,16 @@ export default function Navbar({ brandText = "SuLi Coffee" }) {
                 Cửa hàng
               </Link>
             </li>
-            {/* Chỉ hiện CSP Demo khi truy cập từ localhost:5000 (backend) */}
+            <li>
+              <Link to="/csp-demo" className="nav-link">
+                CSP Demo
+              </Link>
+            </li>
+            {/* Chỉ hiện Backend CSP Demo khi truy cập từ localhost:5000 (backend) */}
             {window.location.port === "5000" && (
               <li>
                 <a href="/csp" target="_self">
-                  CSP Demo
+                  Backend CSP
                 </a>
               </li>
             )}
@@ -233,10 +240,9 @@ export default function Navbar({ brandText = "SuLi Coffee" }) {
           {/* 👤 Avatar */}
           <div
             className="avatar-container"
-            onClick={() => setMenuVisible(!menuVisible)}
             onMouseEnter={() => setMenuVisible(true)}
             onMouseLeave={() => {
-              setTimeout(() => setMenuVisible(false), 300);
+              setTimeout(() => setMenuVisible(false), 200);
             }}
           >
             {renderUserAvatar()}
@@ -244,9 +250,7 @@ export default function Navbar({ brandText = "SuLi Coffee" }) {
             <div
               className={`avatar-dropdown ${menuVisible ? "show" : ""}`}
               onMouseEnter={() => setMenuVisible(true)}
-              onMouseLeave={() => {
-                setTimeout(() => setMenuVisible(false), 300);
-              }}
+              onMouseLeave={() => setMenuVisible(false)}
             >
               {isAuthenticated ? (
                 <>

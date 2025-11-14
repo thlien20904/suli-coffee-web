@@ -31,6 +31,7 @@ import Stores from "./pages/user/StoresUser";
 import VnpayReturn from "./pages/user/VnpayReturn";
 import About from "./pages/user/About";
 import Contact from "./pages/user/Contact";
+import CSPDemo from "./pages/CSPDemo";
 
 // admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -141,6 +142,7 @@ function App() {
         <Route path="/vnpay-return" element={<VnpayReturn />} />
         <Route path="about" element={<About />} />
         <Route path="contact" element={<Contact />} />
+        <Route path="csp-demo" element={<CSPDemo />} />
 
         {/* Profile routes */}
         <Route

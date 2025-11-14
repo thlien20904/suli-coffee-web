@@ -3,7 +3,6 @@ export const getImageUrl = (imageUrl) => {
   if (!imageUrl) {
     const defaultUrl =
       "https://vhkvfmbmmsolqiwrjlxp.supabase.co/storage/v1/object/public/images/no-image.png";
-    console.log("🖼️ No imageUrl provided, using default:", defaultUrl);
     return defaultUrl;
   }
 
@@ -16,7 +15,6 @@ export const getImageUrl = (imageUrl) => {
 
   // Nếu URL đã là absolute (bắt đầu với http/https), trả về trực tiếp
   if (imageUrl.startsWith("http://") || imageUrl.startsWith("https://")) {
-    console.log("🖼️ Using Supabase URL:", imageUrl);
     return imageUrl;
   }
 
@@ -48,7 +46,6 @@ export const getAvatarUrl = (avatarUrl) => {
   if (!avatarUrl) {
     const defaultAvatar =
       "https://vhkvfmbmmsolqiwrjlxp.supabase.co/storage/v1/object/public/images/Avatar/default-avatar.png";
-    console.log("👤 No avatarUrl provided, using default:", defaultAvatar);
     return defaultAvatar;
   }
 
@@ -66,7 +63,6 @@ export const getAvatarUrl = (avatarUrl) => {
 
   // Nếu đã là Supabase URL full, return luôn
   if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
-    console.log("👤 Using full Supabase avatar URL:", avatarUrl);
     return avatarUrl;
   }
 
