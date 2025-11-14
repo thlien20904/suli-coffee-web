@@ -5,6 +5,7 @@ import axios from "axios";
 import { login } from "../../redux/userSlice";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import { jwtDecode } from "jwt-decode";
+import { API_BASE_URL, buildApiUrl } from "../../utils/apiConfig";
 import {
   BsPerson,
   BsLock,
@@ -131,7 +132,7 @@ function Login() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/auth/login", {
+      const res = await axios.post(`${API_BASE_URL}/api/auth/login`, {
         identifier: identifier.trim(),
         password,
         remember,
@@ -291,7 +292,7 @@ function Login() {
           <Button
             className="btn-social btn-facebook"
             as="a"
-            href="http://localhost:5000/api/auth/facebook"
+            href={`${API_BASE_URL}/api/auth/facebook`}
           >
             <BsFacebook className="social-icon" /> Connect with Facebook
           </Button> */}
@@ -299,7 +300,7 @@ function Login() {
           <Button
             className="btn-social btn-google"
             as="a"
-            href="http://localhost:5000/auth/google"
+            href={`${API_BASE_URL}/auth/google`}
             onClick={() =>
               console.log("[Frontend] Redirecting to Google OAuth...")
             }

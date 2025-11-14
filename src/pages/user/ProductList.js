@@ -4,9 +4,9 @@ import axios from "axios";
 import { Row, Col, Card, Form, Button, Spinner } from "react-bootstrap";
 import { FaSearch } from "react-icons/fa";
 import { getImageUrl, getDefaultImage } from "../../utils/imageUtils";
+import { API_BASE_URL, buildApiUrl } from "../../utils/apiConfig";
 import "../../styles/pages/ProductList.css";
 
-const API = "http://localhost:5000";
 const PLACEHOLDER = "/placeholder.jpg";
 
 const CATEGORIES = [
@@ -94,7 +94,7 @@ export default function ProductList() {
         params.set("limit", "100");
 
         const { data } = await axios.get(
-          `${API}/api/products?${params.toString()}`
+          `${API_BASE_URL}/api/products?${params.toString()}`
         );
         setProducts(data.data.products || []);
       } catch (e) {

@@ -5,9 +5,13 @@ import { Row, Col, Button, Spinner, Alert, Form } from "react-bootstrap";
 import { useDispatch } from "react-redux";
 import { setCartCount } from "../../redux/userSlice";
 import { getImageUrl, getDefaultImage } from "../../utils/imageUtils";
+import {
+  API_BASE_URL,
+  API_ENDPOINTS,
+  buildApiUrl,
+} from "../../utils/apiConfig";
 import "../../styles/pages/ProductDetail.css";
 
-const API = "http://localhost:5000";
 const PLACEHOLDER = "/placeholder.jpg";
 
 const fmtVND = (n) =>
