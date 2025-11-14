@@ -30,9 +30,18 @@ export default function Home() {
   useEffect(() => {
     const fetchHome = async () => {
       setLoading(true);
+      // SỬA: Dùng env variable cho API URL (dev: localhost, prod: Render)
+      const API_BASE = process.env.REACT_APP_API_URL || 'http://localhost:5000';
+      const url = `${API_BASE}/api/home`;
+      
       try {
-        const res = await axios.get("http://localhost:5000/api/home");
+        console.log('Gọi API:', url);  // Debug URL thực tế
+        const res = await axios.get(url, { 
+          timeout: 10000,  // SỬA: Thêm timeout 10s để tránh hang
+          headers: { 'Content-Type': 'application/json' }
+        });
         console.log("API response:", res.data);
+        
         // Support multiple response shapes: { success:true, data: [...] } or direct array
         const payload =
           res.data && (res.data.data ?? res.data)
@@ -40,14 +49,15 @@ export default function Home() {
             : [];
         setFoods(Array.isArray(payload) ? payload : []);
       } catch (err) {
-        // Log helpful details (message + server response body if available)
+        // SỬA: Log chi tiết hơn, bao gồm URL gọi
         console.error("Lỗi khi lấy dữ liệu trang chủ:", {
           message: err?.message,
+          url: url,  // Thêm để debug
           responseBody: err?.response?.data,
           status: err?.response?.status,
           stack: err?.stack,
         });
-        // show empty list on error to avoid UI crash
+        // Fallback empty list on error to avoid UI crash
         setFoods([]);
       } finally {
         setLoading(false);
