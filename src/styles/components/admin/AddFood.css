@@ -1,0 +1,128 @@
+.add-food-page .page-container {
+  max-width: 650px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: Arial, sans-serif;
+  color: #000;
+}
+
+.add-food-page h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.add-food-page .form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.add-food-page label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.add-food-page input,
+.add-food-page select,
+.add-food-page textarea {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.add-food-page input:focus,
+.add-food-page select:focus,
+.add-food-page textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.add-food-page .error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.add-food-page .preview-img {
+  display: block;
+  margin-top: 10px;
+  width: 120px;
+  border-radius: 6px;
+}
+
+.add-food-page .form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.add-food-page .btn-primary,
+.add-food-page .btn-secondary {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.add-food-page .btn-primary {
+  background: #007bff;
+  color: #fff;
+}
+
+.add-food-page .btn-primary:hover {
+  background: #0056b3;
+}
+
+.add-food-page .btn-secondary {
+  background: #6c757d;
+  color: #fff;
+}
+
+.add-food-page .btn-secondary:hover {
+  background: #565e64;
+}
+
+/* chip container cho nguyên liệu */
+.add-food-page .chips-container {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.add-food-page .chip {
+  background: #f1f1f1;
+  border-radius: 16px;
+  padding: 4px 10px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+}
+
+.add-food-page .chip-remove {
+  background: transparent;
+  border: none;
+  margin-left: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  color: #d00;
+}
+
+.add-food-page .chip-remove:hover {
+  color: #a00;
+}
+
+.add-food-page button svg {
+  margin-right: 6px;
+  vertical-align: middle;
+}

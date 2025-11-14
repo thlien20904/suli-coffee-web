@@ -1,0 +1,117 @@
+/* Container chính - cách header 70px */
+.product-detail-page {
+    /* Đảm bảo không có ký tự lạ */
+    margin-top: 20px; 
+}
+
+/* Khung ảnh sản phẩm lớn hơn */
+.product-image {
+    width: 100%;
+    /* THAY ĐỔI: Tăng max-width để kéo dài cột, đặc biệt cho sản phẩm không có size/topping */
+    max-width: 400px; 
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    border-radius: 12px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+}
+
+/* Tên sản phẩm */
+.product-name {
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+/* Giá sản phẩm */
+.product-price {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #e63946;
+    margin-bottom: 20px;
+}
+
+/* Tiêu đề cho Size/Topping */
+.product-detail-page p {
+    font-weight: 500;
+    margin-bottom: 5px; 
+    margin-top: 15px; 
+}
+
+/* Size & topping buttons */
+.size-option,
+.topping-option {
+    border-radius: 20px;
+    padding: 8px 16px; 
+    font-size: 0.95rem; 
+    cursor: pointer;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    transition: all 0.2s ease-in-out;
+    white-space: nowrap;
+    margin-right: 8px; /* Đảm bảo khoảng cách ngang */
+}
+
+.size-option:hover,
+.topping-option:hover {
+    border-color: #333;
+    background-color: #f8f8f8;
+}
+
+.size-option.active,
+.topping-option.active {
+    background-color: #198754;
+    color: #fff;
+    border-color: #198754;
+}
+
+/* Container số lượng */
+.quantity-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px; 
+    margin-bottom: 25px; 
+}
+
+/* SỬA LỖI SELECTOR: Target Form.Control (sử dụng selector chung vì đã xóa style inline) */
+/* Cần class Form.Control để target input */
+.quantity-container .form-control { 
+    width: 80px; /* Giảm độ rộng một chút */
+    padding: 6px;
+    text-align: center;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    /* Xóa display: inline-block vì đã dùng d-flex trong quantity-container */
+}
+
+/* Sản phẩm liên quan */
+.related-item {
+    text-align: center;
+    border-radius: 12px;
+    transition: all 0.2s ease;
+    padding: 10px;
+    width: 150px;
+    margin: 10px; 
+}
+
+.related-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.related-image {
+    max-width: 100%;
+    border-radius: 12px;
+}
+
+.related-name {
+    font-weight: 500;
+    margin: 8px 0 4px;
+    font-size: 0.9rem;
+}
+
+.related-price {
+    font-size: 0.9rem;
+    color: #666;
+}

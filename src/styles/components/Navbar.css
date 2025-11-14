@@ -1,0 +1,222 @@
+/* ====== Header / Navbar ====== */
+.header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: #ffffff; /* Navbar nền trắng để không che nội dung */
+  padding: 10px 0;
+  box-shadow: none; /* Bỏ hiệu ứng mờ */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+/* ====== Logo ====== */
+.logo-link {
+  text-decoration: none;
+}
+
+.logo-middle {
+  white-space: nowrap;
+  font-family: "Great Vibes", cursive;
+  font-size: 32px;
+  color: #333; /* màu tối trên nền trắng */
+  transition: color 0.3s ease-in-out;
+}
+
+.logo-middle:hover {
+  color: #c4a48c;
+}
+
+/* ====== Navigation ====== */
+.nav ul {
+  display: flex;
+  gap: 15px;
+  white-space: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  margin-left: 10px;
+}
+
+.nav-link {
+  color: #333 !important;
+  font-weight: bold;
+  text-decoration: none !important;
+  padding: 10px 15px;
+  transition: color 0.3s ease-in-out;
+}
+
+.nav-link:hover {
+  color: #c4a48c !important;
+}
+
+/* ====== Right-side Icons ====== */
+.navbar-right {
+  display: flex;
+  align-items: center;
+}
+
+.navbar-right .position-relative {
+  margin: 0 10px;
+}
+
+.custom-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #c19a6b; /* màu badge đồng tông */
+  color: #fff;
+  font-size: 12px;
+  font-weight: bold;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ====== Avatar & Dropdown ====== */
+.avatar-container {
+  position: relative;
+  cursor: pointer;
+  height: 32px;
+  padding: 8px; /* Larger clickable area */
+  margin: -8px; /* Compensate for padding */
+}
+
+.avatar-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  transition: transform 0.2s ease;
+}
+
+.avatar-img:hover {
+  transform: scale(1.05);
+}
+
+/* Dropdown ẩn mặc định */
+.avatar-dropdown {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  background-color: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 12px 0;
+  border-radius: 8px;
+  min-width: 180px;
+  z-index: 999;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Khi hover vào avatar hoặc menu vẫn giữ hiển thị */
+.avatar-container:hover .avatar-dropdown,
+.avatar-dropdown:hover,
+.avatar-dropdown.show {
+  display: block;
+}
+
+/* Link trong dropdown */
+.avatar-dropdown a,
+.avatar-dropdown p {
+  display: block;
+  padding: 14px 20px;
+  color: #333;
+  text-decoration: none;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 16px;
+  margin: 0;
+  border: none;
+  background: none;
+}
+
+.avatar-dropdown a:hover,
+.avatar-dropdown p:hover {
+  background-color: #f8f9fa;
+  color: #8ebe86;
+  transform: translateX(2px);
+}
+
+/* ====== Search Bar ====== */
+.search-bar {
+  position: relative;
+  flex: 1;
+  max-width: 300px;
+  margin-left: 20px;
+}
+/* Icon 🔍 bên phải trong ô tìm kiếm */
+.search-bar .search-icon-right {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+}
+.custom-search-input {
+  width: 100%;
+  background-color: #fff;
+  border: none;
+  color: #222;
+  height: 38px;
+  border-radius: 20px;
+  padding-left: 40px; /* chừa chỗ cho icon */
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.1);
+}
+.avatar-container {
+  position: relative;
+  cursor: pointer;
+}
+
+.avatar-dropdown {
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.dropdown-item {
+  margin: 0;
+  padding: 14px 20px;
+  color: #333;
+  font-size: 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.dropdown-item:hover {
+  background-color: #f8f9fa;
+  color: #8ebe86;
+  transform: translateX(2px);
+}
+
+.custom-search-input::placeholder {
+  color: #888;
+}
+
+/* 🔍 Icon tìm kiếm nằm trong ô input */
+.search-bar .search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #666;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+/* ====== Responsive ====== */
+@media (max-width: 991.98px) {
+  .nav ul {
+    justify-content: flex-start;
+  }
+  .search-bar {
+    max-width: 200px;
+  }
+  .navbar-right {
+    margin-left: auto;
+  }
+}

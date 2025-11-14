@@ -1,0 +1,133 @@
+@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap");
+
+/* Sidebar container */
+.sidebar {
+  width: 250px;
+  height: 100vh;
+  position: fixed;
+  left: 0;
+  top: 0;
+  background-color: #ffffff;
+  color: #333;
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+  transition: all 0.3s ease-in-out;
+}
+
+/* Logo */
+.sidebar .logo {
+  font-family: "Great Vibes", cursive;
+  font-size: 32px;
+  font-weight: 500;
+  padding: 16px 10px;
+  text-align: center;
+  border-bottom: 1px solid #e0e0e0;
+  background: #fff;
+  letter-spacing: 1px;
+  transition: all 0.3s ease-in-out;
+}
+
+.sidebar .logo:hover {
+  color: #c19a6b; /* ánh vàng nhạt khi hover */
+  transform: scale(1.05);
+}
+
+/* Menu list */
+.sidebar ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar ul li {
+  padding: 12px 20px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  color: #333;
+  transition: background 0.3s ease-in-out;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+.sidebar ul li:hover {
+  background-color: #f0f0f0;
+  color: #28a745;
+}
+
+/* Active */
+.sidebar ul li.active {
+  background-color: #c8c8c8 !important;
+  color: white !important;
+  border-radius: 5px;
+}
+
+/* Arrow rotation */
+.sidebar ul li i {
+  transition: transform 0.3s ease-in-out;
+}
+.sidebar ul li.active > i {
+  transform: rotate(90deg);
+}
+
+/* Submenu */
+.submenu {
+  display: none;
+  padding-left: 10px;
+  margin-top: 5px;
+  border-left: 3px solid #28a745;
+  padding-left: 15px;
+  opacity: 0;
+  transform: translateY(-5px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.submenu.show {
+  display: block;
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.submenu p a {
+  display: block;
+  color: #666;
+  text-decoration: none;
+  padding: 10px 0;
+  padding-left: 10px;
+  transition: all 0.3s ease;
+  border-radius: 6px;
+  font-size: 15px;
+}
+
+.submenu p a:hover {
+  color: #28a745 !important;
+  background-color: rgba(40, 167, 69, 0.1);
+  padding-left: 15px;
+}
+
+/* Logout button */
+.logout-btn {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 12px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  color: #333;
+  transition: background 0.3s ease-in-out;
+}
+.logout-btn:hover {
+  background-color: #f0f0f0;
+  color: #e74c3c;
+}
+.nav-link {
+  text-decoration: none !important;
+  color: inherit !important;
+}
+.nav-link.active {
+  text-decoration: none !important;
+  color: inherit !important;
+  font-weight: bold; /* nếu muốn nổi bật */
+}

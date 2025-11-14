@@ -1,0 +1,228 @@
+.page-container {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  position: relative;
+  z-index: 1;
+}
+
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.top-bar input[type="text"] {
+  width: 200px;
+  padding: 8px 35px 8px 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+
+.top-bar input[type="text"]:focus {
+  border-color: #007bff;
+}
+
+.btn-sort {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background-color: #f3e8ff;
+  color: #7c3aed;
+  font-weight: bold;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  height: 38px;
+}
+
+.btn-sort:hover {
+  background-color: #e9d5ff;
+}
+
+.btn-sort:disabled {
+  background-color: #ddd;
+  cursor: not-allowed;
+  color: #666;
+}
+
+.btn-add {
+  padding: 8px 12px;
+  background-color: #83aafd;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.3s;
+  height: 38px;
+}
+
+.btn-add:hover {
+  background-color: #6b9cff;
+}
+
+.btn-add i {
+  margin-right: 5px;
+}
+
+.ingredient-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  background-color: #fff;
+}
+
+.ingredient-table th,
+.ingredient-table td {
+  padding: 12px;
+  text-align: center;
+  border: 1px solid #ddd;
+  white-space: nowrap;
+  background-color: #f9f9f9;
+}
+
+.ingredient-table th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+  color: #333;
+  pointer-events: none;
+}
+
+.ingredient-table th:after,
+.ingredient-table th:before {
+  display: none !important;
+}
+
+.ingredient-table img {
+  width: 60px;
+  height: 60px;
+  border-radius: 5px;
+  object-fit: cover;
+}
+
+/* Hành động */
+.ingredient-table th:last-child,
+.ingredient-table td:last-child {
+  min-width: 110px; /* đảm bảo đủ chỗ cho 2 nút */
+  white-space: nowrap;
+}
+
+.action-buttons {
+  display: flex; /* xếp ngang */
+  justify-content: center;
+  align-items: center;
+  gap: 8px; /* khoảng cách giữa 2 nút */
+  white-space: nowrap;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-edit,
+.btn-delete {
+  display: flex; /* giữ icon nằm giữa */
+  align-items: center;
+  justify-content: center;
+  width: 32px; /* nhỏ gọn */
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin: 0;
+  padding: 0; /* tránh đẩy td cao */
+  line-height: 1; /* tránh icon đẩy nút cao */
+  position: relative;
+  z-index: 1;
+}
+
+.btn-edit {
+  background-color: #28a745;
+  color: white;
+}
+
+.btn-delete {
+  background-color: #dc3545;
+  color: white;
+}
+
+/* Phân trang */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  margin-top: 20px;
+}
+
+.pagination button {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  background-color: #fff;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.pagination button:hover:not(:disabled) {
+  background-color: #f8f9fa;
+}
+
+.pagination button:disabled {
+  background-color: #eee;
+  cursor: not-allowed;
+  color: #666;
+}
+
+.pagination button.active {
+  background-color: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .top-bar {
+    justify-content: flex-end;
+    gap: 5px;
+  }
+
+  .top-bar input[type="text"] {
+    width: 150px;
+  }
+
+  .ingredient-table th,
+  .ingredient-table td {
+    padding: 8px;
+    font-size: 12px;
+  }
+
+  .ingredient-table img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .action-buttons {
+    gap: 4px;
+  }
+
+  .btn-edit,
+  .btn-delete {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+}

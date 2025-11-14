@@ -1,0 +1,81 @@
+/* Category Add/Edit Page */
+.category-form-page .page-container {
+  max-width: 500px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: Arial, sans-serif;
+  color: #000; /* toàn bộ chữ mặc định là đen */
+}
+
+.category-form-page h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #000; /* tiêu đề đen */
+}
+
+.category-form-page .form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.category-form-page label {
+  font-weight: bold;
+  margin-bottom: 6px;
+  color: #000; /* nhãn đen */
+}
+
+.category-form-page input {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.3s;
+  color: #000; /* chữ trong input đen */
+}
+
+.category-form-page input:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.category-form-page .error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.category-form-page .form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.category-form-page .btn-primary,
+.category-form-page .btn-secondary {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #000; /* chữ trên nút cũng đen */
+  background: #f1f1f1; /* nền xám nhạt cho rõ chữ đen */
+}
+
+.category-form-page .btn-primary:hover,
+.category-form-page .btn-secondary:hover {
+  background: #ddd;
+}
+
+.category-form-page button svg {
+  margin-right: 6px;
+  vertical-align: middle;
+}

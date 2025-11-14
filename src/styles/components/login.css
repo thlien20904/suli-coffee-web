@@ -1,0 +1,146 @@
+/* frontend/src/styles/components/login.css */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap");
+
+.login-page {
+  margin: 0;
+  padding: 0;
+  background: url("/public/images/nen6.png") no-repeat center center fixed;
+  background-size: cover;
+  font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+.login-page .container {
+  width: 35%;
+  margin: 50px auto;
+  min-height: 600px;
+  background: rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  padding: 20px;
+  position: relative;
+  z-index: 1;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 600px;
+  text-align: center;
+  padding: 20px;
+}
+
+.login-container h2 {
+  color: #d81b60;
+  margin-bottom: 10px;
+}
+
+.login-container .subtitle {
+  color: #777;
+  margin-bottom: 30px;
+}
+
+.input-group {
+  position: relative;
+  margin-bottom: 15px;
+}
+
+.input-group .input-icon {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #777;
+}
+
+.input-group .form-control {
+  width: 100%;
+  padding: 12px 40px;
+  border: 1px solid #ccc;
+  border-radius: 25px;
+  background: rgba(255, 255, 255, 0.8);
+}
+
+.input-group .toggle-password {
+  position: absolute;
+  right: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #777;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
+}
+
+.options a {
+  color: #d81b60;
+  text-decoration: none;
+}
+
+.options a:hover {
+  text-decoration: underline;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  background-color: #d81b60;
+  border: none;
+  color: white;
+  border-radius: 25px;
+  margin: 10px 0;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.social-btn {
+  width: 100%;
+  padding: 12px;
+  border-radius: 25px;
+  border: none;
+  margin: 10px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.facebook {
+  background-color: #3b5998;
+  color: white;
+}
+.facebook:hover {
+  background-color: #2d4373;
+}
+.google {
+  background-color: #db4437;
+  color: white;
+}
+.google:hover {
+  background-color: #a50f0f;
+}
+
+.social-btn svg {
+  margin-right: 10px;
+}
+
+.error-message {
+  color: red;
+  font-size: 0.9em;
+  margin-top: 5px;
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  width: 100%;
+}
+
+.form-control.invalid {
+  border: 1px solid red;
+}

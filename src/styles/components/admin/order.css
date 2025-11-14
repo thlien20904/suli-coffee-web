@@ -1,0 +1,243 @@
+/* ==================== IMPORT GOOGLE FONTS ==================== */
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+
+/* ==================== TABS STYLING ==================== */
+.nav-tabs .nav-link {
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #000; /* chữ tab màu đen */
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.nav-tabs .nav-link.active {
+  color: #000; /* active cũng màu đen */
+  font-weight: 700;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #007bff; /* hover vẫn xanh dương */
+}
+/* Tabs chữ đen, kể cả tab active */
+.nav-tabs .nav-link {
+  color: #000 !important; /* ép màu đen */
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.nav-tabs .nav-link.active {
+  color: #000 !important; /* tab active cũng màu đen */
+  font-weight: 700;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #007bff !important; /* hover màu xanh */
+}
+h4.fw-bold {
+  color: #000; /* màu đen */
+  font-family: "Arial", sans-serif; /* hoặc font đẹp khác */
+}
+
+/* ==================== TABLE STYLING ==================== */
+.order-table thead {
+  background: #f1f3f8; /* đổi nền sáng nhạt */
+}
+
+.order-table th {
+  padding: 1rem 0.75rem;
+  text-align: left;
+  color: #000; /* chữ tiêu đề màu đen */
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  text-shadow: none; /* bỏ shadow để chữ rõ */
+  transition: all 0.3s ease;
+}
+
+.order-table th:hover {
+  color: #007bff; /* hover chữ màu xanh */
+}
+
+/* ==================== TABLE BODY ==================== */
+.order-table td {
+  color: #495057; /* chữ nội dung bảng tối hơn */
+}
+
+/* ==================== TABS STYLING ==================== */
+.nav-tabs {
+  border-bottom: 2px solid #dee2e6;
+  margin-bottom: 1.5rem;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  border-bottom: 3px solid transparent;
+  color: #6c757d;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.4s ease;
+  position: relative;
+}
+
+.nav-tabs .nav-link::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  transform: translateX(-50%);
+  width: 0%;
+  height: 3px;
+  background: linear-gradient(135deg, #667eea, #764ba2);
+  border-radius: 3px;
+  transition: all 0.4s ease;
+}
+
+.nav-tabs .nav-link:hover::after {
+  width: 70%;
+}
+
+.nav-tabs .nav-link.active {
+  color: #667eea;
+  font-weight: 700;
+}
+
+.nav-tabs .nav-link.active::after {
+  width: 100%;
+}
+
+/* ==================== TABLE STYLING ==================== */
+.order-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  font-family: "Poppins", sans-serif;
+}
+
+.order-table thead {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.order-table th {
+  padding: 1rem 0.75rem;
+  text-align: left;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s ease;
+}
+
+.order-table th:hover {
+  color: #ffd700;
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+}
+
+/* ==================== TABLE BODY ==================== */
+.order-table tbody tr {
+  transition: all 0.25s ease;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.order-table tbody tr:hover {
+  background: #f1f3f8;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.05);
+}
+
+.order-table td {
+  padding: 1rem 0.75rem;
+  color: #495057;
+  font-size: 0.9rem;
+  vertical-align: middle;
+}
+
+/* ==================== DETAIL LINES ==================== */
+.order-detail-line {
+  padding: 0.5rem 0;
+  border-bottom: 1px dashed #e9ecef;
+  margin-bottom: 0.5rem;
+}
+
+.order-detail-line:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+.order-detail-line .fw-bold {
+  color: #212529;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.order-detail-line .text-muted {
+  font-size: 0.85rem;
+  color: #6c757d !important;
+  font-style: italic;
+}
+
+/* ==================== BADGES ==================== */
+.badge {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.badge:hover {
+  transform: scale(1.05);
+}
+
+.text-success {
+  color: #28a745 !important;
+  font-weight: 600;
+}
+
+.text-danger {
+  color: #dc3545 !important;
+  font-weight: 600;
+}
+
+.text-muted {
+  color: #6c757d !important;
+}
+
+/* ==================== PAGINATION ==================== */
+.pagination .btn-primary {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+  color: #fff;
+  font-weight: 600;
+}
+
+.pagination .btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(102, 126, 234, 0.4);
+}
+/* ====================
+   STICKY TABS
+===================== */
+.nav-tabs-wrapper {
+  position: sticky;
+  top: 60px; /* Chiều cao navbar, sửa theo thực tế */
+  background: #f9f9fb; /* nền đồng bộ với trang */
+  z-index: 100; /* thấp hơn header (1100) */
+  padding: 5px 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}

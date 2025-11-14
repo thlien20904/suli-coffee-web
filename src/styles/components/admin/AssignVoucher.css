@@ -1,0 +1,320 @@
+/* ===============================
+   🎁 ASSIGN VOUCHER - GRADIENT THEME
+   =============================== */
+
+.assign-container {
+  max-width: 100%;
+  margin: -10px auto;
+  padding: 24px 16px;
+  font-family: "Poppins", "Roboto", sans-serif;
+  color: #212529;
+  background: #f9f9fb;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  overflow-x: hidden; /* loại bỏ scroll ngang */
+  box-sizing: border-box;
+}
+
+/* ==== HEADER ==== */
+.assign-container h3 {
+  text-align: center;
+  margin-bottom: 32px;
+  color: #212529;
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.5px;
+  background: linear-gradient(135deg, #83aafd 0%, #70bffc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  position: relative;
+  padding-bottom: 16px;
+}
+
+.assign-container h3::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(135deg, #83aafd 0%, #70bffc 100%);
+  border-radius: 2px;
+}
+
+/* ==== CARD-BASED FORM ==== */
+.assign-form {
+  background: #fff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  margin-bottom: 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 20px;
+  align-items: end;
+  transition: all 0.3s ease;
+  overflow-x: hidden;
+  box-sizing: border-box;
+}
+
+.assign-form:hover {
+  box-shadow: 0 4px 16px rgba(102, 126, 234, 0.15);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.assign-form label {
+  display: block;
+  font-weight: 600;
+  color: #495057;
+  margin-bottom: 8px;
+  font-size: 14px;
+  letter-spacing: 0.3px;
+}
+
+.assign-form select,
+.assign-form input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  background-color: #fafafa;
+  font-size: 14px;
+  color: #212529;
+  font-family: inherit;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  box-sizing: border-box;
+}
+
+.assign-form select:focus,
+.assign-form input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+  background-color: #fff;
+  outline: none;
+}
+
+.assign-form select:hover,
+.assign-form input:hover {
+  border-color: #764ba2;
+}
+
+/* ==== GRADIENT BUTTON ==== */
+.btn-green {
+  background: linear-gradient(135deg, #83aafd 0%, #70bffc 100%);
+  color: #fff;
+  border: none;
+  padding: 12px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-green:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+}
+
+.btn-green:active {
+  transform: translateY(-1px);
+}
+
+/* ==== TABLE SECTION ==== */
+.table-title {
+  margin-bottom: 16px;
+  font-size: 22px;
+  color: #212529;
+  font-weight: 700;
+  padding-top: 16px;
+  text-align: center;
+  background: linear-gradient(135deg, #83aafd 0%, #70bffc 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.table-wrapper {
+  width: 100%;
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  background: #fff;
+  margin-bottom: 24px;
+  overflow-x: hidden; /* chặn scroll ngang */
+}
+
+.assign-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+  color: #495057;
+  table-layout: fixed; /* quan trọng: cột tự chia đều, không tràn */
+  word-break: break-word; /* chữ dài xuống dòng */
+}
+
+.assign-table th,
+.assign-table td {
+  padding: 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+  text-align: center;
+  white-space: normal; /* chữ dài xuống dòng */
+}
+
+.assign-table th {
+  background: linear-gradient(135deg, #83aafd 0%, #70bffc 100%);
+  font-weight: 700;
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 13px;
+  letter-spacing: 0.8px;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.assign-table img {
+  max-width: 80px; /* hạn chế ảnh quá rộng */
+  height: auto;
+  object-fit: cover;
+}
+
+.assign-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.assign-table tbody tr:hover {
+  background-color: #f8f9fa;
+  transform: scale(1.01);
+}
+
+.assign-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* ==== STATUS BADGES ==== */
+.status {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 12px;
+  color: #fff;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+}
+
+.status.active {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.status.expired {
+  background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+}
+
+.status.used {
+  background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+}
+
+/* ==== PAGINATION ==== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+.btn-page {
+  padding: 10px 16px;
+  border: 2px solid #e0e0e0;
+  background: #fff;
+  color: #495057;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  min-width: 44px;
+}
+
+.btn-page:hover:not(:disabled) {
+  border-color: #667eea;
+  color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.2);
+}
+
+.btn-page.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-color: transparent;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+}
+
+.btn-page:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* ==== EMPTY STATE ==== */
+.no-data {
+  text-align: center;
+  color: #6c757d;
+  margin-top: 32px;
+  font-style: italic;
+  font-size: 16px;
+  padding: 40px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 768px) {
+  .assign-container {
+    padding: 16px 12px;
+  }
+
+  .assign-container h3 {
+    font-size: 22px;
+  }
+
+  .assign-form {
+    grid-template-columns: 1fr;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  .btn-green {
+    width: 100%;
+  }
+
+  .assign-table th,
+  .assign-table td {
+    padding: 10px 6px;
+    font-size: 12px;
+  }
+
+  .pagination {
+    gap: 6px;
+  }
+
+  .btn-page {
+    padding: 8px 12px;
+    font-size: 13px;
+    min-width: 36px;
+  }
+}

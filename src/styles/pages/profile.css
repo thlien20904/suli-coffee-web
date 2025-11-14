@@ -1,0 +1,214 @@
+/* Profile Page CSS - Dựa trên style cung cấp, thích nghi với cấu trúc sidebar + content */
+
+/* Wrapper toàn bộ trang */
+.profile-wrapper {
+  background-color: #f5f5f5;
+  padding: 10px 0 40px 0;
+  min-height: 100vh;
+}
+
+/* Container chính (flex: sidebar + content) */
+.profile-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Sidebar bên trái (menu điều hướng) */
+.profile-sidebar {
+  width: 250px;
+  padding: 20px;
+  border-right: 1px solid #e0e0e0;
+  background-color: #fafafa;
+}
+
+/* Header sidebar (avatar + info) */
+.profile-header {
+  text-align: center;
+  margin-bottom: 30px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e0e0e0;
+}
+.profile-header img {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #eacbe2;
+  margin-bottom: 10px;
+}
+.profile-header h5 {
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+  font-weight: 600;
+}
+.profile-header p {
+  margin: 5px 0 0;
+  color: #666;
+  font-size: 14px;
+}
+
+/* Menu sidebar (danh sách buttons) */
+.profile-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.profile-menu li {
+  margin-bottom: 10px;
+}
+.profile-menu button {
+  width: 100%;
+  padding: 12px 16px;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 6px;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  white-space: nowrap;
+}
+.profile-menu button:hover {
+  background-color: #e9ecef;
+  border-color: #adb5bd;
+  color: #000;
+}
+.profile-menu button.active {
+  /* Active state cho section hiện tại */
+  background-color: #ff6f61;
+  border-color: #ff6f61;
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Content bên phải */
+.profile-content {
+  flex: 1;
+  padding: 30px;
+  min-height: 500px;
+}
+
+/* Section chung (ẩn/hiện theo activeSection) */
+.content-section {
+  display: none;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+.content-section.active {
+  display: block;
+  opacity: 1;
+}
+
+/* Form Profile Settings */
+.content-section form {
+  max-width: 600px;
+}
+.content-section label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+.content-section input[type="file"],
+.content-section input[type="text"],
+.content-section input[type="email"],
+.content-section input[type="tel"],
+.content-section textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  font-size: 14px;
+  margin-bottom: 15px;
+  transition: border-color 0.3s ease;
+}
+.content-section input:focus,
+.content-section textarea:focus {
+  outline: none;
+  border-color: #ff6f61;
+  box-shadow: 0 0 0 2px rgba(255, 111, 97, 0.2);
+}
+.content-section textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+.content-section img[alt="preview"] {
+  max-width: 150px;
+  border-radius: 8px;
+  margin-top: 10px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.content-section button[type="submit"] {
+  background-color: #ff6f61;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+.content-section button[type="submit"]:hover {
+  background-color: #e55a50;
+}
+
+/* Các section khác (vouchers, notifications, help) */
+.simple-section {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 16px;
+}
+
+/* Responsive: Mobile */
+@media (max-width: 768px) {
+  .profile-container {
+    flex-direction: column;
+  }
+  .profile-sidebar {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid #e0e0e0;
+  }
+  .profile-content {
+    padding: 20px;
+  }
+  .profile-menu button {
+    width: 100%;
+  }
+  .orders-table {
+    font-size: 12px;
+  }
+  .orders-table th,
+  .orders-table td {
+    padding: 8px 5px;
+  }
+}
+
+/* Alert cho error/loading */
+.alert {
+  padding: 15px;
+  margin-bottom: 20px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+}
+.alert-danger {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+.alert-info {
+  color: #0c5460;
+  background-color: #d1ecf1;
+  border-color: #bee5eb;
+}

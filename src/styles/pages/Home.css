@@ -1,0 +1,72 @@
+/* styles/pages/Home.css */
+.home-root {
+  /* Giữ nguyên style hiện có */
+}
+.home-carousel {
+  margin-top: -25px; /* Đẩy lên cao hơn, tùy chỉnh giá trị này */
+}
+
+.best-sellers .carousel {
+  padding: 20px 0;
+}
+
+.product-card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+.product-img {
+  max-width: 100%;
+  height: 180px;
+  object-fit: contain;
+  background: #fdf6ee;
+  padding: 18px;
+  border-radius: 18px;
+}
+
+.discount-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 0.9rem;
+}
+
+.product-name {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.price {
+  color: #c19a6b;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.sold {
+  color: #6c757d;
+  font-size: 0.9rem;
+}
+
+.btn-buy {
+  border-radius: 20px;
+  padding: 8px 20px;
+  font-size: 0.9rem;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  width: 5%;
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.carousel-control-prev-icon,
+.carousel-control-next-icon {
+  background-size: 100%, 100%;
+}

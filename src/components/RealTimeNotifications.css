@@ -1,0 +1,147 @@
+/* RealTimeNotifications.css - Styles for toast notifications */
+
+.realtime-notifications {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 400px;
+}
+
+.notification-toast {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 15px;
+  animation: slideIn 0.3s ease-out;
+  border-left: 4px solid #667eea;
+}
+
+.notification-toast.notification-order {
+  border-left-color: #667eea;
+}
+
+.notification-toast.notification-order-status {
+  border-left-color: #38ef7d;
+}
+
+.notification-toast.notification-voucher {
+  border-left-color: #ff6a00;
+}
+
+.notification-toast.notification-product {
+  border-left-color: #ee0979;
+}
+
+.notification-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.notification-icon {
+  font-size: 20px;
+}
+
+.notification-header strong {
+  flex: 1;
+  color: #333;
+  font-size: 14px;
+}
+
+.notification-close {
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  width: 24px;
+  height: 24px;
+}
+
+.notification-close:hover {
+  color: #333;
+}
+
+.notification-body {
+  color: #666;
+  font-size: 13px;
+  margin-bottom: 5px;
+}
+
+.notification-time {
+  color: #999;
+  font-size: 11px;
+  text-align: right;
+}
+
+/* Connection status */
+.connection-status {
+  background: white;
+  border-radius: 20px;
+  padding: 8px 15px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  margin-top: 10px;
+}
+
+.status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #ccc;
+  animation: pulse 2s infinite;
+}
+
+.connection-status.connected .status-dot {
+  background: #38ef7d;
+}
+
+.connection-status.disconnected .status-dot {
+  background: #ff6a00;
+}
+
+/* Animations */
+@keyframes slideIn {
+  from {
+    transform: translateX(400px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .realtime-notifications {
+    top: 60px;
+    right: 10px;
+    left: 10px;
+    max-width: none;
+  }
+
+  .notification-toast {
+    padding: 12px;
+  }
+}

@@ -1,0 +1,15 @@
+.user-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.user-layout main {
+  flex: 1;
+  background-color: #f9f9f9;
+  /* padding-top sẽ được set động bởi JS */
+}
+
+.user-layout footer {
+  margin-top: auto;
+}

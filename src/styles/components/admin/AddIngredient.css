@@ -1,0 +1,118 @@
+.add-ingredient-page .page-container {
+  max-width: 650px;
+  margin: 20px auto;
+  background: #fff;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  font-family: Arial, sans-serif;
+  color: #000;
+}
+
+.add-ingredient-page h2 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.add-ingredient-page .form-group {
+  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+}
+
+.add-ingredient-page label {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.add-ingredient-page input,
+.add-ingredient-page select,
+.add-ingredient-page textarea {
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.add-ingredient-page input:focus,
+.add-ingredient-page select:focus,
+.add-ingredient-page textarea:focus {
+  outline: none;
+  border-color: #007bff;
+}
+
+.add-ingredient-page .error-text {
+  color: red;
+  font-size: 12px;
+  margin-top: 3px;
+}
+
+.add-ingredient-page .preview-img {
+  display: block;
+  margin-top: 10px;
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 1px solid #ddd;
+}
+
+.add-ingredient-page .form-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
+
+.add-ingredient-page .btn-primary,
+.add-ingredient-page .btn-secondary {
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.add-ingredient-page .btn-primary {
+  background: #007bff;
+  color: #fff;
+}
+
+.add-ingredient-page .btn-primary:hover {
+  background: #0056b3;
+}
+
+.add-ingredient-page .btn-secondary {
+  background: #6c757d;
+  color: #fff;
+}
+
+.add-ingredient-page .btn-secondary:hover {
+  background: #565e64;
+}
+
+.add-ingredient-page button svg {
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .add-ingredient-page .page-container {
+    padding: 15px;
+  }
+
+  .add-ingredient-page h2 {
+    font-size: 18px;
+  }
+
+  .add-ingredient-page .btn-primary,
+  .add-ingredient-page .btn-secondary {
+    font-size: 14px;
+    padding: 8px 12px;
+  }
+}

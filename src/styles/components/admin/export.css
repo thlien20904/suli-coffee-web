@@ -1,0 +1,94 @@
+.page-container {
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  margin: 0 auto;
+  max-width: 1200px;
+}
+
+.page-container h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 15px;
+  color: #333;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Nút export */
+.btn-export {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background-color: #16a34a;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s, transform 0.2s;
+  margin-bottom: 15px;
+  font-size: 14px;
+}
+
+.btn-export:hover {
+  background-color: #15803d;
+  transform: translateY(-1px);
+}
+
+.btn-export svg {
+  font-size: 18px;
+}
+
+/* Bảng dữ liệu */
+.ingredient-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+  background-color: #fff;
+}
+
+.ingredient-table th,
+.ingredient-table td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+  font-size: 14px;
+}
+
+.ingredient-table th {
+  background-color: #f1f5f9;
+  font-weight: bold;
+  color: #333;
+}
+
+.ingredient-table tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+.ingredient-table tr:hover {
+  background-color: #f3f4f6;
+  transition: background-color 0.2s;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .page-container {
+    padding: 15px;
+  }
+
+  .btn-export {
+    width: 100%;
+    justify-content: center;
+    padding: 12px;
+  }
+
+  .ingredient-table th,
+  .ingredient-table td {
+    font-size: 12px;
+    padding: 6px;
+  }
+}

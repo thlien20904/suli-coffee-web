@@ -1,0 +1,73 @@
+.email-verified-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 20px;
+}
+
+.email-verified-card {
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  border: none;
+  border-radius: 12px;
+  padding: 30px;
+}
+
+.email-verified-card .card-body {
+  padding: 20px;
+}
+
+.success-icon svg {
+  color: #28a745;
+  animation: scaleIn 0.5s ease-out;
+}
+
+.error-icon svg {
+  color: #dc3545;
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.email-verified-card h2 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.email-verified-card .text-muted {
+  font-size: 1rem;
+  color: #6c757d;
+}
+
+.email-verified-card strong {
+  color: #007bff;
+  font-weight: 700;
+}
+
+.email-verified-card .btn {
+  padding: 10px 30px;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.email-verified-card .btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
