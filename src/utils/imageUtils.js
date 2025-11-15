@@ -11,7 +11,6 @@ export const getImageUrl = (imageUrl) => {
   // Fix for corrupted URLs containing localhost + supabase
   if (imageUrl.includes("localhost:5000https://")) {
     const cleanUrl = imageUrl.replace(API_BASE_URL, "");
-    console.warn("🔧 Fixing corrupted URL:", imageUrl, "->", cleanUrl);
     return cleanUrl;
   }
 
@@ -23,18 +22,11 @@ export const getImageUrl = (imageUrl) => {
   // Nếu URL là relative path, chuyển sang Supabase
   if (imageUrl.startsWith("/")) {
     const supabaseUrl = `https://vhkvfmbmmsolqiwrjlxp.supabase.co/storage/v1/object/public/images${imageUrl}`;
-    console.warn(
-      "⚠️ Converting relative path to Supabase:",
-      imageUrl,
-      "->",
-      supabaseUrl
-    );
     return supabaseUrl;
   }
 
   // Fallback: thêm Supabase base URL
   const fallbackUrl = `https://vhkvfmbmmsolqiwrjlxp.supabase.co/storage/v1/object/public/images/${imageUrl}`;
-  console.warn("⚠️ Using Supabase fallback for:", imageUrl, "->", fallbackUrl);
   return fallbackUrl;
 };
 
@@ -54,12 +46,6 @@ export const getAvatarUrl = (avatarUrl) => {
   // Fix for corrupted URLs containing localhost + supabase
   if (avatarUrl.includes("localhost:5000https://")) {
     const cleanUrl = avatarUrl.replace(API_BASE_URL, "");
-    console.warn(
-      "👤🔧 Fixing corrupted avatar URL:",
-      avatarUrl,
-      "->",
-      cleanUrl
-    );
     return cleanUrl;
   }
 
@@ -74,22 +60,10 @@ export const getAvatarUrl = (avatarUrl) => {
       ? avatarUrl.slice(1)
       : avatarUrl;
     const supabaseUrl = `https://vhkvfmbmmsolqiwrjlxp.supabase.co/storage/v1/object/public/images/${cleanPath}`;
-    console.warn(
-      "👤⚠️ Converting avatar path to Supabase:",
-      avatarUrl,
-      "->",
-      supabaseUrl
-    );
     return supabaseUrl;
   }
 
   // Fallback: assume it's just filename, add Avatar/ prefix
   const fallbackUrl = `https://vhkvfmbmmsolqiwrjlxp.supabase.co/storage/v1/object/public/images/Avatar/${avatarUrl}`;
-  console.warn(
-    "👤⚠️ Avatar fallback for filename:",
-    avatarUrl,
-    "->",
-    fallbackUrl
-  );
   return fallbackUrl;
 };
