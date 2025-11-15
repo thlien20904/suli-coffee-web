@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { Link, useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../../../utils/apiConfig";
 
 import "../../../styles/components/admin/Food.css";
 
