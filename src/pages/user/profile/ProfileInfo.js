@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Swal from "sweetalert2";
 import axios from "axios";
+import { buildApiUrl, API_BASE_URL } from "../../../utils/apiConfig";
 
 // Import helper functions
 import { getAvatarUrl, getDefaultImage } from "../../../utils/imageUtils";
@@ -17,8 +18,6 @@ export default function ProfileInfo() {
   const [errors, setErrors] = useState({});
   const [avatarFile, setAvatarFile] = useState(null);
 
-  const backendUrl = "http://localhost:5000";
-
   // =====================
   // Fetch profile khi mount
   // =====================
@@ -28,7 +27,7 @@ export default function ProfileInfo() {
         const token = localStorage.getItem("token");
         if (!token) throw new Error("Bạn cần đăng nhập lại!");
 
-        const res = await axios.get(`${backendUrl}/api/profile`, {
+        const res = await axios.get(buildApiUrl("/api/profile"), {
           headers: { Authorization: `Bearer ${token}` },
         });
 
@@ -125,7 +124,7 @@ export default function ProfileInfo() {
       fd.append("Address", formData.address);
       if (avatarFile) fd.append("AvatarFile", avatarFile);
 
-      const res = await axios.post(`${backendUrl}/api/profile/update`, fd, {
+      const res = await axios.post(buildApiUrl("/api/profile/update"), fd, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../../utils/apiConfig";
 
 function ResetPassword() {
   const location = useLocation();
@@ -28,7 +29,7 @@ function ResetPassword() {
 
     setLoading(true);
     try {
-      const res = await axios.post("http://localhost:5000/api/password/reset", {
+      const res = await axios.post(buildApiUrl("/api/password/reset"), {
         email,
         otp,
         newPassword,

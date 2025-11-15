@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import "../../../styles/pages/notifications.css";
 
 export default function Notifications() {
@@ -11,7 +12,7 @@ export default function Notifications() {
   const pageSize = 4; // ✅ 4 thông báo mỗi trang
 
   const token = localStorage.getItem("token") || "";
-  const BASE = "http://localhost:5000/api/profile";
+  const BASE = buildApiUrl("/api/profile");
 
   useEffect(() => {
     fetchNotifications();

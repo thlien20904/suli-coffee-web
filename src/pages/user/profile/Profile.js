@@ -12,8 +12,7 @@ import OrdersList from "./OrdersList";
 import Vouchers from "./Vouchers";
 import Notifications from "./Notifications";
 import Help from "./Help";
-
-const API_BASE = "http://localhost:5000";
+import { API_BASE_URL } from "../../../utils/apiConfig";
 
 function Profile() {
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ function Profile() {
   const apiFetch = async (url, options = {}) => {
     const headers = { "Content-Type": "application/json", ...options.headers };
     if (token) headers["Authorization"] = `Bearer ${token}`;
-    const res = await fetch(`${API_BASE}${url}`, { ...options, headers });
+    const res = await fetch(`${API_BASE_URL}${url}`, { ...options, headers });
     const data = await res.json();
     if (!res.ok) throw new Error(data.message || "Lỗi máy chủ");
     return data;

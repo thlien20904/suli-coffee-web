@@ -1,8 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { Container, Card, Form, Button, Alert, Spinner } from "react-bootstrap";
-
-const API = "http://localhost:5000";
+import { API_BASE_URL } from "../../utils/apiConfig";
 
 export default function QRPayment() {
   const location = useLocation();
@@ -31,14 +30,17 @@ export default function QRPayment() {
       setIsSubmitting(true);
       setError("");
 
-      const response = await fetch(`${API}/api/orders/confirm-qr-payment`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ orderId }),
-      });
+      const response = await fetch(
+        `${API_BASE_URL}/api/orders/confirm-qr-payment`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({ orderId }),
+        }
+      );
 
       const data = await response.json();
 

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Line } from "react-chartjs-2";
 import { getImageUrl } from "../../utils/imageUtils";
+import { buildApiUrl } from "../../utils/apiConfig";
 import "bootstrap/dist/css/bootstrap.min.css";
 import {
   Chart as ChartJS,
@@ -34,7 +35,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/admin/home");
+        const res = await axios.get(buildApiUrl("/api/admin/home"));
         setData(res.data);
       } catch (err) {
         console.error("Error fetching dashboard:", err);

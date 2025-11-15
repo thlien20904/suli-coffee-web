@@ -15,8 +15,7 @@ import {
   BsEyeSlash,
   BsExclamationCircle,
 } from "react-icons/bs";
-
-const API_BASE = "http://localhost:5000";
+import { buildApiUrl } from "../../utils/apiConfig";
 
 const isEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test((v || "").trim());
 const isUsername = (v) => /^[a-zA-Z0-9_.-]{3,30}$/.test((v || "").trim());
@@ -100,7 +99,7 @@ export default function Register() {
 
     setLoading(true);
     try {
-      const resp = await axios.post(`${API_BASE}/api/auth/register`, {
+      const resp = await axios.post(buildApiUrl("/api/auth/register"), {
         username: form.username.trim(),
         email: form.email.trim(),
         password: form.password,
@@ -326,14 +325,14 @@ export default function Register() {
             {/* <Button
               className="btn-social btn-facebook d-flex align-items-center justify-content-center gap-2"
               as="a"
-              href={`${API_BASE}/api/auth/facebook`}
+              href={buildApiUrl("/api/auth/facebook")}
             >
               <BsFacebook /> Connect with Facebook
             </Button> */}
             <Button
               className="btn-social btn-google d-flex align-items-center justify-content-center gap-2"
               as="a"
-              href={`${API_BASE}/auth/google`}
+              href={buildApiUrl("/auth/google")}
             >
               <BsGoogle /> Connect with Google
             </Button>

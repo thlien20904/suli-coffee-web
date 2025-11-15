@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import Swal from "sweetalert2";
 import "../../../styles/pages/Vouchers.css";
 
@@ -24,10 +25,10 @@ export default function VoucherTab() {
     try {
       setLoading(true);
       const [resAvailable, resMy] = await Promise.all([
-        axios.get("http://localhost:5000/api/profile/vouchers", {
+        axios.get(buildApiUrl("/api/profile/vouchers"), {
           headers: { Authorization: `Bearer ${token}` },
         }),
-        axios.get("http://localhost:5000/api/profile/vouchers/my", {
+        axios.get(buildApiUrl("/api/profile/vouchers/my"), {
           headers: { Authorization: `Bearer ${token}` },
         }),
       ]);
@@ -58,7 +59,7 @@ export default function VoucherTab() {
   const claimVoucher = async (voucherId) => {
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/profile/vouchers/receive",
+        buildApiUrl("/api/profile/vouchers/receive"),
         { voucherId },
         { headers: { Authorization: `Bearer ${token}` } }
       );

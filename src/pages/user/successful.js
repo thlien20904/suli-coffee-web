@@ -6,8 +6,7 @@ import {
   faCheckCircle,
   faExclamationTriangle,
 } from "@fortawesome/free-solid-svg-icons";
-
-const API = "http://localhost:5000";
+import { API_BASE_URL } from "../../utils/apiConfig";
 
 export default function Successful() {
   const navigate = useNavigate();
@@ -24,7 +23,7 @@ export default function Successful() {
   const apiFetch = async (url, options = {}) => {
     const headers = { "Content-Type": "application/json", ...options.headers };
     if (token) headers["Authorization"] = `Bearer ${token}`;
-    const res = await fetch(`${API}${url}`, { ...options, headers });
+    const res = await fetch(`${API_BASE_URL}${url}`, { ...options, headers });
 
     if (res.status === 401) {
       localStorage.removeItem("token");
@@ -248,11 +247,10 @@ export default function Successful() {
         </div>
       </div>
 
-
       {/* CSS nội tuyến để mô phỏng giao diện Razor */}
       <style>{`
         body {
-          background-image: url('${API}/images/nen4.png');
+          background-image: url('${API_BASE_URL}/images/nen4.png');
           background-size: cover;
           background-position: center;
           background-repeat: no-repeat;

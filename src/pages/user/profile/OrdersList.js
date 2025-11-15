@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import Swal from "sweetalert2";
 import "../../../styles/pages/orderslist.css";
 
@@ -28,11 +29,11 @@ export default function OrdersList() {
       const token = localStorage.getItem("token");
       let res;
       if (tab === "pending") {
-        res = await axios.get("http://localhost:5000/api/orders/pending", {
+        res = await axios.get(buildApiUrl("/api/orders/pending"), {
           headers: { Authorization: `Bearer ${token}` },
         });
       } else {
-        res = await axios.get("http://localhost:5000/api/profile/orders", {
+        res = await axios.get(buildApiUrl("/api/profile/orders"), {
           headers: { Authorization: `Bearer ${token}` },
           params: { tab, page, pageSize: 5 },
         });
@@ -78,7 +79,7 @@ export default function OrdersList() {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.post(
-          "http://localhost:5000/api/profile/orders/cancel",
+          buildApiUrl("/api/profile/orders/cancel"),
           { orderId },
           { headers: { Authorization: `Bearer ${token}` } }
         );
