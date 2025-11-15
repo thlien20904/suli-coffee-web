@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../../utils/apiConfig";
 
 function ForgotPassword() {
   const [email, setEmail] = useState("");
@@ -17,10 +18,9 @@ function ForgotPassword() {
     setError("");
     setLoading(true);
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/password/forgot",
-        { email }
-      );
+      const res = await axios.post(buildApiUrl("/api/password/forgot"), {
+        email,
+      });
       setMessage(res.data.message || "OTP đã được gửi đến email của bạn!");
       setTimeout(() => {
         navigate("/reset-password", { state: { email } });

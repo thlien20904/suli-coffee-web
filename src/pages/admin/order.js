@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { buildApiUrl } from "../../utils/apiConfig";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../../styles/components/admin/order.css";
 
@@ -23,7 +24,7 @@ const Order = () => {
 
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:5000/api/admin/orders", {
+      const res = await axios.get(buildApiUrl("/api/admin/orders"), {
         headers: { Authorization: `Bearer ${token}` },
         params: { tab, page, pageSize: 10 },
       });
@@ -66,7 +67,7 @@ const Order = () => {
   const updateStatus = async (id, statusId) => {
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/admin/orders/${id}/status`,
+        buildApiUrl(`/api/admin/orders/${id}/status`),
         { statusId },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

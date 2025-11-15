@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { Link, useNavigate } from "react-router-dom";
+import { buildApiUrl } from "../../../utils/apiConfig";
 
 import "../../../styles/components/admin/Food.css";
 
@@ -18,7 +19,7 @@ const Food = () => {
 
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/foods", {
+      const res = await axios.get(buildApiUrl("/api/admin/foods"), {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         params: { limit: 1000 },
       });
@@ -47,7 +48,7 @@ const Food = () => {
         try {
           setLoadingId(id); // ✅ bật loading cho món này
           await axios.post(
-            "http://localhost:5000/api/admin/foods/delete",
+            buildApiUrl("/api/admin/foods/delete"),
             { id },
             {
               headers: {

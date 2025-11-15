@@ -45,7 +45,7 @@ export default function ProductDetail() {
     const fetchProduct = async () => {
       setLoading(true);
       try {
-        const { data } = await axios.get(`${API}/api/products/${id}`);
+        const { data } = await axios.get(buildApiUrl(`/api/products/${id}`));
         if (data.success) {
           const pdata = data.data; // data.data mới chứa product, sizes, toppings, related
           setProduct(pdata.product);

@@ -10,6 +10,7 @@ import {
   setUnreadCount,
   updateUser,
 } from "../../../redux/userSlice";
+import { API_BASE_URL, buildApiUrl } from "../../../utils/apiConfig";
 import "../../../styles/components/Navbar.css";
 
 export default function Navbar({ brandText = "SuLi Coffee" }) {
@@ -30,12 +31,9 @@ export default function Navbar({ brandText = "SuLi Coffee" }) {
     const fetchAvatar = async () => {
       try {
         if (!isAuthenticated) return;
-        const res = await axios.get(
-          "http://localhost:5000/api/profile/avatar",
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const res = await axios.get(buildApiUrl("/api/profile/avatar"), {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (res.data?.success && res.data.data) {
           // backend may return either a string (AvatarURL) or an object { avatarUrl: ... }
@@ -51,7 +49,7 @@ export default function Navbar({ brandText = "SuLi Coffee" }) {
           if (avatarPath) {
             const fullUrl = avatarPath.startsWith("http")
               ? avatarPath
-              : `http://localhost:5000${avatarPath}`;
+              : `${API_BASE_URL}${avatarPath}`;
             dispatch(updateUser({ avatar: fullUrl }));
           }
         }
@@ -72,7 +70,7 @@ export default function Navbar({ brandText = "SuLi Coffee" }) {
           dispatch(setCartCount(0));
           return;
         }
-        const res = await axios.get("http://localhost:5000/api/cart", {
+        const res = await axios.get(buildApiUrl("/api/cart"), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.data && res.data.cart) {
@@ -100,10 +98,9 @@ export default function Navbar({ brandText = "SuLi Coffee" }) {
           return;
         }
 
-        const res = await axios.get(
-          "http://localhost:5000/api/profile/notifications",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+        const res = await axios.get(buildApiUrl("/api/profile/notifications"), {
+          headers: { Authorization: `Bearer ${token}` },
+        });
 
         if (res.data?.success && res.data.notifications) {
           const unread = res.data.notifications.filter((n) => !n.IsRead).length;

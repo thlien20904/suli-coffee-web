@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../../../redux/userSlice";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import "../../../styles/components/Header.css";
 
 export default function Header() {
@@ -72,7 +73,7 @@ export default function Header() {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/admin/auth/change-password",
+        buildApiUrl("/api/admin/auth/change-password"),
         { oldPassword, newPassword },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

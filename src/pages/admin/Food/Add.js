@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { FaSave, FaTimes } from "react-icons/fa";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import "../../../styles/components/admin/AddFood.css";
 
 const FormField = ({ label, error, children }) => (
@@ -35,8 +36,8 @@ const AddFood = () => {
     (async () => {
       try {
         const [catRes, ingRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/admin/categories"),
-          axios.get("http://localhost:5000/api/admin/ingredients"),
+          axios.get(buildApiUrl("/api/admin/categories")),
+          axios.get(buildApiUrl("/api/admin/ingredients")),
         ]);
         setCategories(catRes.data.data || []);
         setIngredients(ingRes.data.data || []);
@@ -158,7 +159,7 @@ const AddFood = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/admin/foods/add",
+        buildApiUrl("/api/admin/foods/add"),
         formData,
         {
           headers: {
@@ -181,22 +182,26 @@ const AddFood = () => {
       }
     } catch (err) {
       console.error("❌ Lỗi thêm món ăn:", err);
-      
+
       // ← FIX CHÍNH: Xử lý lỗi từ backend (400, 401, etc.)
       if (err.response) {
         const { status, data } = err.response;
         const errorMsg = data?.message || "Lỗi không xác định từ server";
-        
+
         if (status === 400) {
           // Lỗi validation/duplicate từ backend (ví dụ: tên trùng)
           Swal.fire("", errorMsg, "error");
-          
+
           // Bonus: Set error cho field cụ thể nếu backend chỉ rõ (ví dụ: nếu message chứa "Tên món ăn")
           if (errorMsg.includes("Tên món ăn")) {
             setErrors((prev) => ({ ...prev, FoodName: errorMsg }));
           }
         } else if (status === 401) {
-          Swal.fire("", "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!", "warning");
+          Swal.fire(
+            "",
+            "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!",
+            "warning"
+          );
           // Có thể redirect login: window.location.href = "/login";
         } else if (status >= 500) {
           Swal.fire("", "Lỗi server. Vui lòng thử lại sau!", "error");

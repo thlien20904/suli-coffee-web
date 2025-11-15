@@ -13,8 +13,8 @@ import {
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import { setCartCount } from "../../redux/userSlice"; // Đảm bảo đường dẫn này là đúng
+import { API_BASE_URL, buildApiUrl } from "../../utils/apiConfig";
 
-const API = "http://localhost:5000";
 const PLACEHOLDER = "/placeholder.jpg"; // Thêm placeholder image
 
 // Hàm định dạng tiền tệ VND
@@ -76,8 +76,8 @@ export default function Cart() {
       const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
       const url =
         userId && !token
-          ? `${API}/api/cart?userId=${userId}`
-          : `${API}/api/cart`;
+          ? `${API_BASE_URL}/api/cart?userId=${userId}`
+          : `${API_BASE_URL}/api/cart`;
       const { data } = await axios.get(url, { headers });
       if (!data || !data.cart) {
         setCart([]);
@@ -146,7 +146,7 @@ export default function Cart() {
       const payload = { gioHangId };
       if (userId && !token) payload.userId = userId;
       const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
-      await axios.post(`${API}/api/cart/delete`, payload, { headers });
+      await axios.post(`${API_BASE_URL}/api/cart/delete`, payload, { headers });
 
       // Update cart state and then update global cart count to avoid dispatch during render
       const newCartAfterDelete = cart.filter(
@@ -177,7 +177,7 @@ export default function Cart() {
       setSelectedToppingIds((item.Toppings || []).map((t) => t.ToppingID));
 
       const productId = item.FoodId;
-      const res = await axios.get(`${API}/api/products/${productId}`);
+      const res = await axios.get(`${API_BASE_URL}/api/products/${productId}`);
 
       const body = res.data || {};
       let sizes = [];
@@ -239,9 +239,13 @@ export default function Cart() {
       if (userId && !token) payload.userId = userId;
       const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
       // Gọi API cập nhật tùy chọn
-      const res = await axios.post(`${API}/api/cart/update-options`, payload, {
-        headers,
-      });
+      const res = await axios.post(
+        `${API_BASE_URL}/api/cart/update-options`,
+        payload,
+        {
+          headers,
+        }
+      );
 
       const updated = res?.data?.item || res?.data?.updatedItem || res?.data;
       if (res?.data?.success && updated) {
@@ -302,7 +306,7 @@ export default function Cart() {
       const payload = { gioHangId, quantity: newQty };
       if (userId && !token) payload.userId = userId;
       const headers = token ? { Authorization: `Bearer ${token}` } : undefined;
-      const res = await axios.post(`${API}/api/cart/update`, payload, {
+      const res = await axios.post(`${API_BASE_URL}/api/cart/update`, payload, {
         headers,
       });
       if (res.data && res.data.success) {
@@ -408,7 +412,9 @@ export default function Cart() {
                   <td>
                     <img
                       src={
-                        item.ImageURL ? `${API}${item.ImageURL}` : PLACEHOLDER
+                        item.ImageURL
+                          ? `${API_BASE_URL}${item.ImageURL}`
+                          : PLACEHOLDER
                       }
                       alt={item.FoodName}
                       style={{ width: 90, height: 90 }}

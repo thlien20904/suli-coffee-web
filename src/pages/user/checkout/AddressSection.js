@@ -1,6 +1,7 @@
 import { Form, Button, Alert, Spinner } from "react-bootstrap";
 import { useEffect, useState, useCallback } from "react";
 import axios from "axios";
+import { buildApiUrl } from "../../../utils/apiConfig";
 
 axios.defaults.withCredentials = true;
 const token = localStorage.getItem("token");
@@ -200,13 +201,13 @@ export default function AddressSection({
     setError("");
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/orders/addresses/save",
+        buildApiUrl("/api/orders/addresses/save"),
         addressToSave
       );
       if (res.data.success) {
         setSaveSuccess("Đã lưu địa chỉ thành công!");
         const addrRes = await axios.get(
-          `http://localhost:5000/api/orders/addresses?userId=${user.Id}`
+          buildApiUrl(`/api/orders/addresses?userId=${user.Id}`)
         );
         setUserAddresses(addrRes.data.data || []);
         setSelectedSavedAddressId(res.data.addressId);
@@ -225,7 +226,7 @@ export default function AddressSection({
   // Fetch provinces
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/address/provinces")
+      .get(buildApiUrl("/api/address/provinces"))
       .then((res) => {
         if (res.data.success) setProvinces(res.data.data || []);
       })
@@ -242,7 +243,7 @@ export default function AddressSection({
       return;
     }
     axios
-      .get(`http://localhost:5000/api/address/districts/${selectedProvince}`)
+      .get(buildApiUrl(`/api/address/districts/${selectedProvince}`))
       .then((res) => {
         if (res.data.success) setDistricts(res.data.data || []);
       })
@@ -257,7 +258,7 @@ export default function AddressSection({
       return;
     }
     axios
-      .get(`http://localhost:5000/api/address/wards/${selectedDistrict}`)
+      .get(buildApiUrl(`/api/address/wards/${selectedDistrict}`))
       .then((res) => {
         if (res.data.success) setWards(res.data.data || []);
       })
@@ -294,7 +295,7 @@ export default function AddressSection({
 
         console.log("🔍 Geocoding address...");
         const res = await axios.post(
-          "http://localhost:5000/api/orders/geocode",
+          buildApiUrl("/api/orders/geocode"),
           {
             address: baseStreet,
             ward: wardName,
@@ -360,7 +361,7 @@ export default function AddressSection({
       try {
         const token = localStorage.getItem("token");
         const res = await axios.post(
-          "http://localhost:5000/api/orders/shipping/calculate",
+          buildApiUrl("/api/orders/shipping/calculate"),
           {
             cuaHangId: selectedCuaHangId,
             address: baseStreet,
