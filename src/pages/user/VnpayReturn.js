@@ -28,7 +28,7 @@ export default function VnpayReturn() {
     const fetchVnpayResult = async () => {
       try {
         const response = await axios.get(
-          `${buildApiUrl()}/api/orders/vnpay-return${queryParams}`
+          buildApiUrl(`/api/orders/vnpay-return${queryParams}`)
         );
 
         const data = response.data;

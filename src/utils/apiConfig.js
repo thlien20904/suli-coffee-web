@@ -6,6 +6,12 @@ export { API_BASE_URL, SOCKET_URL };
 
 // Helper function để build API URLs
 export const buildApiUrl = (endpoint) => {
+  // Validate endpoint parameter
+  if (!endpoint || typeof endpoint !== "string") {
+    console.warn("buildApiUrl: endpoint is required and must be a string");
+    return API_BASE_URL;
+  }
+
   // Ensure endpoint starts with /
   const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
   return `${API_BASE_URL}${cleanEndpoint}`;

@@ -56,7 +56,7 @@ export default function Checkout() {
         credentials: "include",
       };
 
-      const res = await fetch(`${buildApiUrl()}${url}`, fetchOptions);
+      const res = await fetch(buildApiUrl(url), fetchOptions);
       if (res.status === 401) {
         localStorage.removeItem("token");
         navigate("/login");
