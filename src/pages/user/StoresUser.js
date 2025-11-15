@@ -7,12 +7,12 @@ import {
   useJsApiLoader,
 } from "@react-google-maps/api";
 import { getImageUrl } from "../../utils/imageUtils";
-import { API_BASE_URL, buildApiUrl } from "../../utils/apiConfig";
+import { buildApiUrl } from "../../utils/apiConfig";
 import "../../styles/pages/StoresUser.css";
 
-const API_URL = `${API_BASE_URL}/api/stores`;
-const SEARCH_API_URL = `${API_BASE_URL}/api/stores/search`;
-const NEAREST_ALL_API_URL = `${API_BASE_URL}/api/stores/nearest-all`;
+const API_URL = buildApiUrl("/api/stores");
+const SEARCH_API_URL = buildApiUrl("/api/stores/search");
+const NEAREST_ALL_API_URL = buildApiUrl("/api/stores/nearest-all");
 // Use env var so billing-enabled API key isn't hard-coded in source.
 // Set REACT_APP_GOOGLE_MAPS_API_KEY in your environment (.env) when running the frontend.
 const GOOGLE_MAPS_API_KEY = process.env.REACT_APP_GOOGLE_MAPS_API_KEY || "";

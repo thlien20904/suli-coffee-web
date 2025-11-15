@@ -3,7 +3,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 import { Row, Col, Alert, Spinner } from "react-bootstrap";
 import CheckoutForm from "./checkout/CheckoutForm";
 import OrderSummary from "./checkout/OrderSummary";
-import { API_BASE_URL } from "../../utils/apiConfig";
+import { buildApiUrl } from "../../utils/apiConfig";
 
 export default function Checkout() {
   const location = useLocation();
@@ -56,7 +56,7 @@ export default function Checkout() {
         credentials: "include",
       };
 
-      const res = await fetch(`${API_BASE_URL}${url}`, fetchOptions);
+      const res = await fetch(`${buildApiUrl()}${url}`, fetchOptions);
       if (res.status === 401) {
         localStorage.removeItem("token");
         navigate("/login");
