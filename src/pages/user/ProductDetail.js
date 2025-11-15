@@ -97,7 +97,7 @@ export default function ProductDetail() {
     };
 
     try {
-      const res = await axios.post(`${API}/api/cart/add`, payload, {
+      const res = await axios.post(buildApiUrl("/api/cart/add"), payload, {
         // Gửi token qua header Authorization
         headers: {
           Authorization: `Bearer ${token}`,
@@ -106,7 +106,7 @@ export default function ProductDetail() {
 
       if (res.data.success) {
         // Cập nhật số lượng giỏ hàng
-        const cartRes = await axios.get(`${API}/api/cart`, {
+        const cartRes = await axios.get(buildApiUrl("/api/cart"), {
           // Gửi token qua header Authorization
           headers: {
             Authorization: `Bearer ${token}`,

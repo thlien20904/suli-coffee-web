@@ -14,24 +14,8 @@
       href="https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap"
       rel="stylesheet"
     />
-
-    <!-- Inline style có nonce -->
-    <style nonce="__NONCE__">
-      body {
-        font-family: Arial, sans-serif;
-        margin: 0;
-        padding: 0;
-      }
-    </style>
   </head>
   <body>
     <div id="root"></div>
-
-    <!-- CSP nonce exposure for testing -->
-    <script nonce="__NONCE__">
-      // ✅ Expose nonce to global scope
-      window.__CSP_NONCE__ = "__NONCE__";
-      console.log("✅ CSP initialized with nonce:", window.__CSP_NONCE__);
-    </script>
   </body>
 </html>

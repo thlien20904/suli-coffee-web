@@ -13,6 +13,7 @@ import {
   Title,
   Tooltip,
   Legend,
+  Filler,
 } from "chart.js";
 import { useNavigate } from "react-router-dom";
 import "../../styles/pages/AdminDashboard.css";
@@ -24,7 +25,8 @@ ChartJS.register(
   LineElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
+  Filler
 );
 
 const AdminDashboard = () => {
