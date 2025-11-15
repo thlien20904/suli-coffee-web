@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import Swal from "sweetalert2";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../../../styles/components/admin/Voucher.css";
@@ -27,7 +28,7 @@ const VoucherList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const API_URL = "http://localhost:5000/api/admin/voucher";
+  const API_URL = buildApiUrl("/api/admin/voucher");
 
   // ===================== FETCH =====================
   const fetchVouchers = async () => {

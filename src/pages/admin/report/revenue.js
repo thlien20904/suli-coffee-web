@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import {
   Chart as ChartJS,
   Title,
@@ -37,7 +38,9 @@ const RevenueReport = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `http://localhost:5000/api/admin/report/revenue?year=${year}&month=${month}&type=${type}`
+        buildApiUrl(
+          `/api/admin/report/revenue?year=${year}&month=${month}&type=${type}`
+        )
       );
       if (res.data.success) {
         setData(res.data.revenueData || []);

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/components/admin/AddCategory.css";
@@ -18,7 +19,7 @@ const AddPayment = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/admin/payment/add",
+        buildApiUrl("/api/admin/payment/add"),
         { TenPhuongThuc: name },
         {
           headers: {

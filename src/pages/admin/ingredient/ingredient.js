@@ -18,13 +18,10 @@ const Ingredient = () => {
   // Fetch nguyên liệu
   const fetchData = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/admin/ingredients",
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-          params: { limit: 1000 },
-        }
-      );
+      const res = await axios.get(buildApiUrl("/api/admin/ingredients"), {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        params: { limit: 1000 },
+      });
       setIngredients(res.data.data || []);
     } catch (err) {
       console.error("❌ Lỗi khi fetch ingredients:", err);
@@ -50,7 +47,7 @@ const Ingredient = () => {
         try {
           setLoadingId(id);
           await axios.post(
-            "http://localhost:5000/api/admin/ingredients/delete",
+            buildApiUrl("/api/admin/ingredients/delete"),
             { id },
             {
               headers: {

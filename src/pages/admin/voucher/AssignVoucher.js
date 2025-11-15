@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import Swal from "sweetalert2";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../../../styles/components/admin/AssignVoucher.css";
@@ -14,11 +15,11 @@ const AssignVoucher = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 5;
 
-  const API_USER = "http://localhost:5000/api/admin/users";
-  const API_VOUCHER = "http://localhost:5000/api/admin/voucher";
-  const API_ASSIGN = "http://localhost:5000/api/admin/voucher/assign";
-  const API_ASSIGNED = "http://localhost:5000/api/admin/voucher/assigned";
-  const API_ASSIGN_ALL = "http://localhost:5000/api/admin/voucher/assign/all"; // ✅ thêm
+  const API_USER = buildApiUrl("/api/admin/users");
+  const API_VOUCHER = buildApiUrl("/api/admin/voucher");
+  const API_ASSIGN = buildApiUrl("/api/admin/voucher/assign");
+  const API_ASSIGNED = buildApiUrl("/api/admin/voucher/assigned");
+  const API_ASSIGN_ALL = buildApiUrl("/api/admin/voucher/assign/all"); // ✅ thêm
 
   // ================== FETCH DATA ==================
   useEffect(() => {

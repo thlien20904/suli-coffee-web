@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { getImageUrl } from "../../../utils/imageUtils";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import "../../../styles/components/admin/bestseller.css";
 
 const BestSeller = () => {
@@ -11,9 +12,7 @@ const BestSeller = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await axios.get(
-          "http://localhost:5000/api/admin/report/banchay"
-        );
+        const res = await axios.get(buildApiUrl("/api/admin/report/banchay"));
         if (res.data.success) {
           setProducts(res.data.data);
         }

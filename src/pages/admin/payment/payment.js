@@ -16,7 +16,7 @@ const Payment = () => {
   // Fetch danh sách phương thức thanh toán
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/payment", {
+      const res = await axios.get(buildApiUrl("/api/admin/payment"), {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setPayments(res.data.data || []);
@@ -45,7 +45,7 @@ const Payment = () => {
           setLoadingId(id);
 
           const res = await axios.post(
-            "http://localhost:5000/api/admin/payment/delete",
+            buildApiUrl("/api/admin/payment/delete"),
             { id },
             {
               headers: {

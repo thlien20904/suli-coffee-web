@@ -74,19 +74,16 @@ const StaffEdit = () => {
     const fetchData = async () => {
       try {
         // Lấy danh sách vai trò
-        const resRoles = await axios.get(
-          "http://localhost:5000/api/admin/roles",
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
-          }
-        );
+        const resRoles = await axios.get(buildApiUrl("/api/admin/roles"), {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
         if (resRoles.data.success) setRoles(resRoles.data.data || []);
 
         // Lấy thông tin nhân viên
         const resStaff = await axios.get(
-          `http://localhost:5000/api/admin/staff/edit/${id}`,
+          buildApiUrl(`/api/admin/staff/edit/${id}`),
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -136,7 +133,7 @@ const StaffEdit = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/admin/staff/edit/${id}`,
+        buildApiUrl(`/api/admin/staff/edit/${id}`),
         form,
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

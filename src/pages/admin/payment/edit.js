@@ -14,7 +14,7 @@ const EditPayment = () => {
     const fetchPayment = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/admin/payment/edit/${id}`,
+          buildApiUrl(`/api/admin/payment/edit/${id}`),
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -45,7 +45,7 @@ const EditPayment = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/admin/payment/edit/${id}`,
+        buildApiUrl(`/api/admin/payment/edit/${id}`),
         { TenPhuongThuc: name },
         {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -16,12 +17,9 @@ const Category = () => {
   // Fetch danh mục
   const fetchData = async () => {
     try {
-      const res = await axios.get(
-        "http://localhost:5000/api/admin/categories",
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await axios.get(buildApiUrl("/api/admin/categories"), {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
       setCategories(res.data.data || []);
     } catch (err) {
       console.error("Lỗi khi fetch categories:", err);
@@ -48,7 +46,7 @@ const Category = () => {
           setLoadingId(id);
 
           const res = await axios.post(
-            "http://localhost:5000/api/admin/categories/delete",
+            buildApiUrl("/api/admin/categories/delete"),
             { id },
             {
               headers: {

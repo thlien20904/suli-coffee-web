@@ -16,7 +16,7 @@ const Staff = () => {
   // ================== Fetch danh sách staff ==================
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/staff", {
+      const res = await axios.get(buildApiUrl("/api/admin/staff"), {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setStaffs(res.data.data || []);
@@ -45,7 +45,7 @@ const Staff = () => {
           setLoadingId(id);
 
           const res = await axios.post(
-            "http://localhost:5000/api/admin/staff/delete",
+            buildApiUrl("/api/admin/staff/delete"),
             { id },
             {
               headers: {

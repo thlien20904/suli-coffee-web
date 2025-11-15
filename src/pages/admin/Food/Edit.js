@@ -3,6 +3,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { FaSave, FaTimes } from "react-icons/fa";
 import { useParams } from "react-router-dom"; // ✅ Thêm useParams
+import { buildApiUrl } from "../../../utils/apiConfig";
 import "../../../styles/components/admin/AddFood.css";
 
 const FormField = ({ label, error, children }) => (
@@ -42,9 +43,9 @@ const EditFood = () => {
         }
 
         const [catRes, ingRes, foodRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/admin/categories"),
-          axios.get("http://localhost:5000/api/admin/ingredients"),
-          axios.get(`http://localhost:5000/api/admin/foods/${id}`, {
+          axios.get(buildApiUrl("/api/admin/categories")),
+          axios.get(buildApiUrl("/api/admin/ingredients")),
+          axios.get(buildApiUrl(`/api/admin/foods/${id}`), {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
@@ -188,7 +189,7 @@ const EditFood = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/admin/foods/edit/${id}`,
+        buildApiUrl(`/api/admin/foods/edit/${id}`),
         formData,
         {
           headers: {

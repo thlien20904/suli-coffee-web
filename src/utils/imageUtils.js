@@ -1,4 +1,6 @@
 // Helper function để xử lý URL ảnh từ database
+import { API_BASE_URL } from "./apiConfig";
+
 export const getImageUrl = (imageUrl) => {
   if (!imageUrl) {
     const defaultUrl =
@@ -8,7 +10,7 @@ export const getImageUrl = (imageUrl) => {
 
   // Fix for corrupted URLs containing localhost + supabase
   if (imageUrl.includes("localhost:5000https://")) {
-    const cleanUrl = imageUrl.replace("http://localhost:5000", "");
+    const cleanUrl = imageUrl.replace(API_BASE_URL, "");
     console.warn("🔧 Fixing corrupted URL:", imageUrl, "->", cleanUrl);
     return cleanUrl;
   }
@@ -51,7 +53,7 @@ export const getAvatarUrl = (avatarUrl) => {
 
   // Fix for corrupted URLs containing localhost + supabase
   if (avatarUrl.includes("localhost:5000https://")) {
-    const cleanUrl = avatarUrl.replace("http://localhost:5000", "");
+    const cleanUrl = avatarUrl.replace(API_BASE_URL, "");
     console.warn(
       "👤🔧 Fixing corrupted avatar URL:",
       avatarUrl,

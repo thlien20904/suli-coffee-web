@@ -7,8 +7,7 @@ import {
   faCheckCircle,
   faExclamationCircle,
 } from "@fortawesome/free-solid-svg-icons";
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
+import { buildApiUrl } from "../../utils/apiConfig";
 
 export default function VnpayReturn() {
   const [loading, setLoading] = useState(true);
@@ -29,7 +28,7 @@ export default function VnpayReturn() {
     const fetchVnpayResult = async () => {
       try {
         const response = await axios.get(
-          `${API_BASE_URL}/api/orders/vnpay-return${queryParams}`
+          `${buildApiUrl()}/api/orders/vnpay-return${queryParams}`
         );
 
         const data = response.data;

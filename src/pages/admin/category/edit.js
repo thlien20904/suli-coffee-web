@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { useNavigate, useParams } from "react-router-dom";
+import { buildApiUrl } from "../../../utils/apiConfig";
 import "../../../styles/components/admin/AddCategory.css";
 
 const CategoryEdit = () => {
@@ -14,7 +15,7 @@ const CategoryEdit = () => {
     const fetchCategory = async () => {
       try {
         const res = await axios.get(
-          `http://localhost:5000/api/admin/categories/edit/${id}`,
+          buildApiUrl(`/api/admin/categories/edit/${id}`),
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -49,7 +50,7 @@ const CategoryEdit = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/admin/categories/edit/${id}`,
+        buildApiUrl(`/api/admin/categories/edit/${id}`),
         { CategoryName: name },
         {
           headers: {

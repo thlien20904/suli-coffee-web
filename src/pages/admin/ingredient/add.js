@@ -103,7 +103,7 @@ const AddIngredient = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/admin/ingredients/add",
+        buildApiUrl("/api/admin/ingredients/add"),
         formData,
         {
           headers: {

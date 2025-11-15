@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { buildApiUrl } from "../../utils/apiConfig";
 import Swal from "sweetalert2";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import "../../styles/components/admin/Invoice.css";
@@ -20,7 +21,7 @@ const Invoice = () => {
   // 🔹 Lấy danh sách hóa đơn
   const fetchData = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/admin/invoice", {
+      const res = await axios.get(buildApiUrl("/api/admin/invoice"), {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         params: { limit: 1000 },
       });
@@ -89,12 +90,9 @@ const Invoice = () => {
   // 🔹 Xem chi tiết
   const viewDetail = async (id) => {
     try {
-      const res = await axios.get(
-        `http://localhost:5000/api/admin/invoice/${id}`,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await axios.get(buildApiUrl(`/api/admin/invoice/${id}`), {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
 
       // Kiểm tra dữ liệu
       console.log("📦 Chi tiết hóa đơn:", res.data);

@@ -28,7 +28,7 @@ const AddStaff = () => {
   React.useEffect(() => {
     (async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/admin/roles", {
+        const res = await axios.get(buildApiUrl("/api/admin/roles"), {
           headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
         });
         if (res.data.success) setRoles(res.data.data || []);
@@ -100,13 +100,9 @@ const AddStaff = () => {
     }
 
     try {
-      const res = await axios.post(
-        "http://localhost:5000/api/admin/staff/add",
-        form,
-        {
-          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-        }
-      );
+      const res = await axios.post(buildApiUrl("/api/admin/staff/add"), form, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
 
       if (res.data.success) {
         Swal.fire({

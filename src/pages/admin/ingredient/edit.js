@@ -35,7 +35,7 @@ const EditIngredient = () => {
         }
 
         const res = await axios.get(
-          `http://localhost:5000/api/admin/ingredients/${id}`,
+          buildApiUrl(`/api/admin/ingredients/${id}`),
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -147,7 +147,7 @@ const EditIngredient = () => {
 
     try {
       const res = await axios.post(
-        `http://localhost:5000/api/admin/ingredients/edit/${id}`,
+        buildApiUrl(`/api/admin/ingredients/edit/${id}`),
         formData,
         {
           headers: {
