@@ -82,67 +82,88 @@ export default function Register() {
 
   const showFieldError = (field) =>
     (touched[field] || submitted) && (errors[field] || clientErrors[field]);
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  setSubmitted(true);
+  setAlertMsg("");
+  setSuccessMsg("");
+  setErrors({});
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitted(true);
-    setAlertMsg("");
-    setSuccessMsg("");
-    setErrors({});
+  const ce = clientErrors;
+  if (Object.keys(ce).length) {
+    setErrors(ce);
+    setAlertMsg("Vui lòng kiểm tra và sửa các trường bên dưới.");
+    return;
+  }
 
-    const ce = clientErrors;
-    if (Object.keys(ce).length) {
-      setErrors(ce);
-      setAlertMsg("Vui lòng kiểm tra và sửa các trường bên dưới.");
-      return;
+  setLoading(true);
+  const apiUrl = buildApiUrl("/api/auth/register");
+  console.log(`🆕 REGISTER SUBMIT START: URL=${apiUrl} | Data=`, { // Log request (ẩn password)
+    username: form.username.trim(),
+    email: form.email.trim(),
+    fullName: form.fullName.trim(),
+    phone: form.phone.trim(),
+    address: form.address.trim(),
+  });
+
+  const startTime = Date.now(); // SỬA: Di chuyển ra ngoài try-catch
+  try {
+    const resp = await axios.post(apiUrl, {
+      username: form.username.trim(),
+      email: form.email.trim(),
+      password: form.password,
+      fullName: form.fullName.trim(),
+      phone: form.phone.trim(),
+      address: form.address.trim(),
+    }, {
+      timeout: 45000, // 45s cho email
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    const duration = Date.now() - startTime;
+    console.log(`✅ REGISTER SUCCESS: ${duration}ms | Response=`, resp.data);
+
+    if (resp?.data?.success) {
+      setSuccessMsg(
+        resp.data.message || "Đăng ký tạm thời thành công. Vui lòng kiểm tra email để xác nhận và hoàn tất đăng ký."
+      );
+    } else {
+      setSuccessMsg(resp.data.message || "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận.");
     }
+  } catch (err) {
+    const duration = Date.now() - startTime; // BÂY GIỜ OK, startTime defined
+    console.error(`❌ REGISTER ERROR after ${duration}ms:`, {
+      message: err.message,
+      status: err.response?.status,
+      statusText: err.response?.statusText,
+      data: err.response?.data,
+      code: err.code, // 'ECONNABORTED' nếu timeout
+    });
 
-    setLoading(true);
-    try {
-      const resp = await axios.post(buildApiUrl("/api/auth/register"), {
-        username: form.username.trim(),
-        email: form.email.trim(),
-        password: form.password,
-        fullName: form.fullName.trim(),
-        phone: form.phone.trim(),
-        address: form.address.trim(),
-      });
-
-      // Server now sends a verification email. Inform the user and do not auto-redirect.
-      if (resp && resp.data && resp.data.success) {
-        setSuccessMsg(
-          "Đăng ký tạm thời thành công. Vui lòng kiểm tra email để xác nhận và hoàn tất đăng ký."
-        );
-      } else {
-        setSuccessMsg(
-          "Đăng ký thành công. Vui lòng kiểm tra email để xác nhận."
-        );
-      }
-    } catch (err) {
-      // If server returned field errors (e.g. 409 with errors array), map them to the form
-      const resp = err?.response?.data;
-      if (resp) {
-        // If server returned structured errors array: [{ field, msg }]
-        if (Array.isArray(resp.errors) && resp.errors.length) {
-          const fieldErrs = {};
-          resp.errors.forEach((it) => {
-            if (it.field) fieldErrs[it.field] = it.msg || it.message || it.msg;
-          });
-          setErrors((prev) => ({ ...prev, ...fieldErrs }));
-          setAlertMsg("Vui lòng kiểm tra và sửa các trường có lỗi.");
-        } else if (resp.message) {
-          // Generic server message
-          setAlertMsg(resp.message);
-        } else {
-          setAlertMsg("Đăng ký thất bại. Vui lòng thử lại.");
-        }
+    const resp = err?.response?.data;
+    if (resp) {
+      if (Array.isArray(resp.errors) && resp.errors.length) {
+        const fieldErrs = {};
+        resp.errors.forEach((it) => {
+          if (it.field) fieldErrs[it.field] = it.msg || it.message || it.msg;
+        });
+        setErrors((prev) => ({ ...prev, ...fieldErrs }));
+        setAlertMsg("Vui lòng kiểm tra và sửa các trường có lỗi.");
+      } else if (resp.message) {
+        setAlertMsg(resp.message);
       } else {
         setAlertMsg("Đăng ký thất bại. Vui lòng thử lại.");
       }
-    } finally {
-      setLoading(false);
+    } else if (err.code === 'ECONNABORTED') {
+      setAlertMsg("Yêu cầu quá lâu (timeout). Kiểm tra kết nối hoặc thử lại.");
+    } else {
+      setAlertMsg(err.message || "Đăng ký thất bại. Vui lòng thử lại.");
     }
-  };
+  } finally {
+    setLoading(false);
+    console.log(`🔚 REGISTER END: Loading=false | Total time: ${Date.now() - startTime}ms`);
+  }
+};
 
   return (
     <div
