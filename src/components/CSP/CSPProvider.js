@@ -164,12 +164,7 @@ export const CSPProvider = ({ children }) => {
         window.location.hostname.includes("github.io");
 
       if (isStaticHosting) {
-        console.warn(
-          "⚠️ Nonce testing not available on static hosting (Vercel/Netlify)"
-        );
-        console.info(
-          "💡 For nonce testing, deploy frontend through backend server"
-        );
+        // Silent return on static hosting - nonce not available
         return null;
       }
 
@@ -226,14 +221,7 @@ export const CSPProvider = ({ children }) => {
         window.location.hostname.includes("github.io");
 
       if (isStaticHosting) {
-        console.warn("⚠️ Nonce testing disabled on static hosting");
-        console.info(
-          "💡 Nonce testing requires backend server to inject nonce into HTML"
-        );
-        console.info("   Current setup: Frontend (Vercel) + Backend (Render)");
-        console.info(
-          "   Nonce testing available at: https://suli-coffee.onrender.com"
-        );
+        // Silent return on static hosting - nonce testing not available
         return;
       }
 
@@ -319,12 +307,7 @@ export const CSPProvider = ({ children }) => {
       document.documentElement.appendChild(s);
     };
 
-    console.log("🔐 CSP Helpers Available:");
-    console.log("  • window.getCSPNonce()          - Get current nonce");
-    console.log("  • window.testCSPNonce()         - Auto test with nonce");
-    console.log(
-      "  • window.testManualNonce(code)  - Test custom code with nonce"
-    );
+    // CSP Helpers available: window.getCSPNonce(), window.testCSPNonce(), window.testManualNonce()
 
     // Intercept appendChild để track scripts với nonce
     const originalAppendChild = Element.prototype.appendChild;

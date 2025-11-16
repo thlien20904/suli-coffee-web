@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from "react";
 import { useCSP } from "./CSPProvider";
+import "./HashNonceDemo.css";
+
+// ⭐ Hash cố định để test (SHA-256 của script content)
+const DEMO_SCRIPTS = {
+  hello: {
+    content: "console.log('Hello from hash script!');",
+    hash: "sha256-BKU8tKGd0KZuZtZW7c8Qpe3gvmFJ9cJdVe3v3tZyGbI=",
+  },
+  alert: {
+    content: "alert('Hash demo works!');",
+    hash: "sha256-R8TqFr7hL0qK3Y9F8K5Nc9L3hV7F8qRz0Td1cM2QzN4=",
+  },
+  pass: {
+    content: "console.log('✅ CSP Pass Test'); window.__hashTestPass = true;",
+    hash: "sha256-7KeYHLqXdC8kKKqmVYS0d4v1Y7eG5vC5qv+T0rJ1w1M=",
+  },
+};
 
 const HashNonceDemo = () => {
   const [currentNonce, setCurrentNonce] = useState("");
@@ -229,7 +246,50 @@ const HashNonceDemo = () => {
     }
   };
 
-  // Test 3: Script with hash (calculate and test)
+  // Test 3A: Script với hash cố định (demo cho thầy)
+  const testFixedHashScript = (scriptKey = "pass") => {
+    const demoScript = DEMO_SCRIPTS[scriptKey];
+    if (!demoScript) {
+      addTestResult("Fixed Hash Test", false, "❌ Invalid script key");
+      return;
+    }
+
+    console.log(`🔍 Testing fixed hash script: ${scriptKey}`);
+    console.log(`📝 Content: ${demoScript.content}`);
+    console.log(`#️⃣ Hash: ${demoScript.hash}`);
+
+    try {
+      const script = document.createElement("script");
+      script.textContent = demoScript.content;
+      document.head.appendChild(script);
+
+      setTimeout(() => {
+        // Check if script executed
+        if (window.__hashTestPass) {
+          addTestResult(
+            `Fixed Hash (${scriptKey})`,
+            true,
+            `✅ Script executed! Hash: ${demoScript.hash}`
+          );
+          delete window.__hashTestPass;
+        } else {
+          addTestResult(
+            `Fixed Hash (${scriptKey})`,
+            false,
+            `❌ Blocked. Add to CSP: script-src '${demoScript.hash}'`
+          );
+        }
+      }, 200);
+    } catch (error) {
+      addTestResult(
+        `Fixed Hash (${scriptKey})`,
+        false,
+        `❌ Error: ${error.message}`
+      );
+    }
+  };
+
+  // Test 3B: Script with dynamic hash (calculate and test)
   const testScriptWithHash = async () => {
     const scriptContent = `console.log('✅ Hash verified script'); window.hashTestResult = 'SUCCESS';`;
 
@@ -311,11 +371,11 @@ const HashNonceDemo = () => {
               📋 Copy
             </button>
           </div>
-          <div style={{ fontSize: "12px", color: "#666", marginTop: "10px" }}>
+          <div className="nonce-hint">
             💡 Nonce được lấy từ: CSP violations log → Meta tag → CSPProvider
             <br />
             {currentNonce === "⚠️ Nonce không khả dụng" && (
-              <span style={{ color: "#dc3545" }}>
+              <span className="warning-text">
                 ⚠️ Backend chưa cấu hình nonce hoặc meta tag chưa được replace
               </span>
             )}
@@ -335,18 +395,18 @@ const HashNonceDemo = () => {
 
       <div className="test-section">
         <h3>🧪 Security Tests</h3>
-        <p style={{ color: "#666", marginBottom: "15px" }}>
+        <p className="test-description">
           Click các nút dưới đây để test CSP với nonce và hash
         </p>
-        <div className="test-grid">
+        <div className="test-buttons">
           <button onClick={testInlineWithoutNonce} className="test-btn danger">
-            ❌ Test No Nonce
+            ❌ No Nonce (Fail)
           </button>
           <button
             onClick={testInlineWithValidNonce}
             className="test-btn success"
           >
-            ✅ Test Valid Nonce
+            ✅ Valid Nonce (Pass)
           </button>
           <button
             onClick={() => {
@@ -355,18 +415,40 @@ const HashNonceDemo = () => {
               script.textContent = "alert('Should NOT show!');";
               document.documentElement.appendChild(script);
               addTestResult(
-                "Inline Script (Wrong Nonce)",
+                "Wrong Nonce",
                 false,
-                "❌ Script với nonce sai - phải bị chặn"
+                "❌ Script với nonce sai - bị chặn"
               );
             }}
             className="test-btn warning"
           >
-            ⚠️ Test Wrong Nonce
+            ⚠️ Wrong Nonce (Fail)
+          </button>
+          <button
+            onClick={() => testFixedHashScript("pass")}
+            className="test-btn info"
+          >
+            #️⃣ Fixed Hash (Demo)
           </button>
           <button onClick={testScriptWithHash} className="test-btn info">
-            🔐 Test Script Hash
+            🔐 Dynamic Hash
           </button>
+        </div>
+
+        <div className="demo-hash-card">
+          <h4>📌 Demo Hash Cố Định (Cho Thầy)</h4>
+          <div className="demo-hash-content">
+            <p>
+              <strong>Content:</strong> <code>{DEMO_SCRIPTS.pass.content}</code>
+            </p>
+            <p>
+              <strong>Hash:</strong> <code>{DEMO_SCRIPTS.pass.hash}</code>
+            </p>
+            <p className="hint">
+              💡 Thêm vào CSP:{" "}
+              <code>script-src '{DEMO_SCRIPTS.pass.hash}'</code>
+            </p>
+          </div>
         </div>
       </div>
 
@@ -401,31 +483,15 @@ const HashNonceDemo = () => {
       <div className="education-section">
         <h3>📚 Hướng Dẫn Sử Dụng</h3>
 
-        <div
-          className="info-card"
-          style={{
-            marginBottom: "20px",
-            background: "#fff3cd",
-            borderColor: "#ffc107",
-          }}
-        >
+        <div className="info-card console-test-card">
           <h4>💻 Test Nonce từ Console</h4>
           <p>Copy và paste các lệnh sau vào Developer Console (F12):</p>
 
-          <div style={{ marginTop: "15px" }}>
-            <p style={{ fontWeight: "bold", marginBottom: "5px" }}>
+          <div className="console-section">
+            <p className="console-section-title">
               1. Lấy nonce từ CSP error message:
             </p>
-            <code
-              style={{
-                display: "block",
-                background: "#2d3748",
-                color: "#e2e8f0",
-                padding: "10px",
-                borderRadius: "5px",
-                marginBottom: "10px",
-              }}
-            >
+            <code className="console-code">
               // Trigger CSP violation và lấy nonce
               <br />
               const s = document.createElement('script');
@@ -443,19 +509,10 @@ const HashNonceDemo = () => {
               📋 Hoặc copy nonce từ ô "Current Nonce" ở trên ↑
             </p>
 
-            <p style={{ fontWeight: "bold", marginBottom: "5px" }}>
+            <p className="console-section-title">
               2. Sử dụng helper functions (dễ nhất):
             </p>
-            <code
-              style={{
-                display: "block",
-                background: "#2d3748",
-                color: "#e2e8f0",
-                padding: "10px",
-                borderRadius: "5px",
-                marginBottom: "10px",
-              }}
-            >
+            <code className="console-code">
               // Lấy nonce
               <br />
               const nonce = window.getCSPNonce();
@@ -471,19 +528,8 @@ const HashNonceDemo = () => {
               window.testCSPNonce('7++0UYfwS8Urr/s581IIFA==');
             </code>
 
-            <p style={{ fontWeight: "bold", marginBottom: "5px" }}>
-              3. Test script thủ công:
-            </p>
-            <code
-              style={{
-                display: "block",
-                background: "#2d3748",
-                color: "#e2e8f0",
-                padding: "10px",
-                borderRadius: "5px",
-                marginBottom: "10px",
-              }}
-            >
+            <p className="console-section-title">3. Test script thủ công:</p>
+            <code className="console-code">
               const nonce = window.getCSPNonce();
               <br />
               const s = document.createElement('script');
@@ -495,18 +541,10 @@ const HashNonceDemo = () => {
               document.documentElement.appendChild(s);
             </code>
 
-            <p style={{ fontWeight: "bold", marginBottom: "5px" }}>
+            <p className="console-section-title">
               4. Test script không có nonce (bị chặn):
             </p>
-            <code
-              style={{
-                display: "block",
-                background: "#2d3748",
-                color: "#e2e8f0",
-                padding: "10px",
-                borderRadius: "5px",
-              }}
-            >
+            <code className="console-code">
               const s = document.createElement('script');
               <br />
               s.textContent = "alert('Should NOT show!');";
@@ -547,216 +585,6 @@ const HashNonceDemo = () => {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        .hash-nonce-demo {
-          padding: 20px;
-          max-width: 1200px;
-          margin: 0 auto;
-        }
-
-        .nonce-section {
-          background: #f8f9fa;
-          padding: 20px;
-          border-radius: 10px;
-          margin: 20px 0;
-        }
-
-        .nonce-info {
-          margin-bottom: 20px;
-        }
-
-        .nonce-display {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-          margin: 10px 0;
-        }
-
-        .nonce-display code {
-          background: #e9ecef;
-          padding: 10px 15px;
-          border-radius: 5px;
-          font-family: monospace;
-          font-size: 14px;
-          flex: 1;
-          word-break: break-all;
-        }
-
-        .refresh-btn {
-          background: #007bff;
-          color: white;
-          border: none;
-          padding: 10px 15px;
-          border-radius: 5px;
-          cursor: pointer;
-          font-size: 14px;
-        }
-
-        .csp-example {
-          background: #2d3748;
-          color: #e2e8f0;
-          padding: 15px;
-          border-radius: 5px;
-          font-size: 12px;
-          overflow-x: auto;
-        }
-
-        .test-section {
-          margin: 30px 0;
-        }
-
-        .test-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-          gap: 15px;
-          margin: 20px 0;
-        }
-
-        .test-btn {
-          padding: 15px;
-          border: none;
-          border-radius: 8px;
-          cursor: pointer;
-          font-weight: bold;
-          font-size: 14px;
-          transition: all 0.3s ease;
-          text-align: center;
-        }
-
-        .test-btn.danger {
-          background: #dc3545;
-          color: white;
-        }
-
-        .test-btn.warning {
-          background: #ffc107;
-          color: #212529;
-        }
-
-        .test-btn.info {
-          background: #17a2b8;
-          color: white;
-        }
-
-        .test-btn.success {
-          background: #28a745;
-          color: white;
-        }
-
-        .test-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-        }
-
-        .results-section {
-          margin: 30px 0;
-          background: white;
-          border-radius: 10px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-        }
-
-        .results-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 20px;
-          background: #f8f9fa;
-          border-bottom: 1px solid #dee2e6;
-        }
-
-        .clear-btn {
-          background: #6c757d;
-          color: white;
-          border: none;
-          padding: 8px 16px;
-          border-radius: 5px;
-          cursor: pointer;
-        }
-
-        .results-list {
-          max-height: 400px;
-          overflow-y: auto;
-        }
-
-        .result-item {
-          padding: 15px 20px;
-          border-bottom: 1px solid #f1f3f5;
-        }
-
-        .result-item.success {
-          border-left: 4px solid #28a745;
-          background: #f8fff9;
-        }
-
-        .result-item.failure {
-          border-left: 4px solid #dc3545;
-          background: #fff8f8;
-        }
-
-        .result-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 5px;
-        }
-
-        .result-test {
-          font-weight: bold;
-          color: #333;
-        }
-
-        .result-time {
-          font-size: 12px;
-          color: #666;
-        }
-
-        .result-message {
-          font-family: monospace;
-          font-size: 13px;
-          color: #555;
-        }
-
-        .education-section {
-          margin: 40px 0;
-        }
-
-        .info-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 20px;
-          margin: 20px 0;
-        }
-
-        .info-card {
-          background: white;
-          padding: 20px;
-          border-radius: 10px;
-          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-          border-top: 4px solid #007bff;
-        }
-
-        .info-card h4 {
-          color: #333;
-          margin: 0 0 10px 0;
-        }
-
-        .info-card p {
-          color: #666;
-          margin: 10px 0;
-          line-height: 1.5;
-        }
-
-        .info-card code {
-          display: block;
-          background: #f8f9fa;
-          padding: 8px;
-          border-radius: 3px;
-          font-size: 12px;
-          margin-top: 10px;
-        }
-      `}</style>
     </div>
   );
 };
