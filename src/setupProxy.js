@@ -54,9 +54,8 @@ module.exports = function (app) {
       console.log(`🚫 CSP ENFORCED for ${req.path}`);
       console.log(`🔑 NONCE: ${nonce}`);
       console.log(`🎯 CSP POLICY: ${csp}`);
-    } else if (!isStaticAsset) {
-      console.log(`🚫 CSP applied to ${req.path}`);
     }
+    // Removed noisy logs for static assets
     next();
   });
 

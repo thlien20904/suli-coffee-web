@@ -99,25 +99,14 @@ export const CSPProvider = ({ children }) => {
     window.addEventListener("csp-pass", handlePass);
 
     // Connect to Socket.IO for CSP monitoring
-    // Auto-detect production environment
     const isProduction =
       window.location.hostname.includes("vercel.app") ||
-      window.location.hostname.includes("suli-coffee-web") ||
       process.env.NODE_ENV === "production";
-
-    // Determine backend URL with production-first priority
-    let backendUrl = "http://localhost:5000"; // Default for development
-
-    if (isProduction) {
-      backendUrl = "https://suli-coffee.onrender.com";
-    }
-
-    // Override with environment variable if set
-    if (process.env.REACT_APP_BACKEND_URL) {
-      backendUrl = process.env.REACT_APP_BACKEND_URL;
-    }
-
-    console.log("🔌 CSP Socket connecting to:", backendUrl, { isProduction });
+    const backendUrl =
+      process.env.REACT_APP_BACKEND_URL ||
+      (isProduction
+        ? "https://suli-coffee.onrender.com"
+        : "http://localhost:5000");
 
     const socketConnection = io(backendUrl, {
       transports: ["websocket", "polling"],
@@ -168,29 +157,49 @@ export const CSPProvider = ({ children }) => {
 
     // 🔥 Global helper functions for CSP testing
     window.getCSPNonce = () => {
+      // Check if running on static hosting (Vercel) - no nonce support
+      const isStaticHosting =
+        window.location.hostname.includes("vercel.app") ||
+        window.location.hostname.includes("netlify.app") ||
+        window.location.hostname.includes("github.io");
+
+      if (isStaticHosting) {
+        console.warn(
+          "⚠️ Nonce testing not available on static hosting (Vercel/Netlify)"
+        );
+        console.info(
+          "💡 For nonce testing, deploy frontend through backend server"
+        );
+        return null;
+      }
+
       // Method 1: Return cached nonce
       if (window.__cspNonce) {
         return window.__cspNonce;
       }
 
-      // Method 2: Extract từ violations đã có
+      // Method 2: Extract from existing script tags with nonce
+      const scripts = document.querySelectorAll("script[nonce]");
+      if (scripts.length > 0) {
+        for (let script of scripts) {
+          const nonce = script.getAttribute("nonce");
+          if (nonce && nonce !== "__NONCE__") {
+            window.__cspNonce = nonce;
+            console.log("✅ Nonce found from <script> tag");
+            return nonce;
+          }
+        }
+      }
+
+      // Method 3: Extract từ violations đã có
       if (window.cspViolations && window.cspViolations.length > 0) {
         const violation = window.cspViolations[0];
         const policy = violation["original-policy"] || "";
         const match = policy.match(/'nonce-([^']+)'/);
         if (match) {
           window.__cspNonce = match[1];
+          console.log("✅ Nonce found from CSP violation");
           return match[1];
-        }
-      }
-
-      // Method 3: Extract from existing script tags with nonce
-      const scripts = document.querySelectorAll("script[nonce]");
-      if (scripts.length > 0) {
-        const nonce = scripts[0].getAttribute("nonce");
-        if (nonce && nonce !== "__NONCE__") {
-          window.__cspNonce = nonce;
-          return nonce;
         }
       }
 
@@ -200,20 +209,41 @@ export const CSPProvider = ({ children }) => {
         const nonce = meta.getAttribute("content");
         if (nonce && nonce !== "__NONCE__") {
           window.__cspNonce = nonce;
+          console.log("✅ Nonce found from meta tag");
           return nonce;
         }
       }
 
+      console.warn("⚠️ No nonce found - backend not injecting nonce");
       return null;
     };
 
     window.testCSPNonce = (customNonce) => {
+      // Check if on static hosting
+      const isStaticHosting =
+        window.location.hostname.includes("vercel.app") ||
+        window.location.hostname.includes("netlify.app") ||
+        window.location.hostname.includes("github.io");
+
+      if (isStaticHosting) {
+        console.warn("⚠️ Nonce testing disabled on static hosting");
+        console.info(
+          "💡 Nonce testing requires backend server to inject nonce into HTML"
+        );
+        console.info("   Current setup: Frontend (Vercel) + Backend (Render)");
+        console.info(
+          "   Nonce testing available at: https://suli-coffee.onrender.com"
+        );
+        return;
+      }
+
       const nonce = customNonce || window.getCSPNonce();
       if (!nonce) {
-        console.error("❌ No nonce found. Trigger a CSP violation first:");
+        console.error("❌ No nonce found in HTML.");
         console.info(
-          "   const s = document.createElement('script'); s.textContent='//test'; document.head.appendChild(s);"
+          "💡 Make sure backend is injecting nonce into <script> tags"
         );
+        console.info("   Check: View Page Source → search for 'nonce='");
         return;
       }
 
