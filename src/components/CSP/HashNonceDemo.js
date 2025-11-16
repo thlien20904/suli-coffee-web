@@ -18,6 +18,63 @@ const DEMO_SCRIPTS = {
   },
 };
 
+// ⭐ Calculate hash helper (available globally)
+const calculateHashHelper = async (scriptContent) => {
+  const encoder = new TextEncoder();
+  const data = encoder.encode(scriptContent);
+  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+  return `sha256-${btoa(String.fromCharCode(...new Uint8Array(hashBuffer)))}`;
+};
+
+// ⭐ GLOBAL helper functions - available immediately in Console!
+if (typeof window !== "undefined") {
+  window.hashTest = {
+    // Test with fixed hash (works on static hosting like Vercel)
+    testHash: (key = "pass") => {
+      const script = DEMO_SCRIPTS[key];
+      if (!script) {
+        console.error("❌ Invalid key! Available:", Object.keys(DEMO_SCRIPTS));
+        return;
+      }
+      const s = document.createElement("script");
+      s.textContent = script.content;
+      document.head.appendChild(s);
+      console.log("📝 Content:", script.content);
+      console.log("🔐 Hash:", script.hash);
+      console.log("💡 Add to backend CSP: script-src '" + script.hash + "'");
+    },
+
+    // Show all available hashes
+    showAll: () => {
+      console.log("📋 Available hash demos:");
+      Object.keys(DEMO_SCRIPTS).forEach((key) => {
+        console.log(`\n🔹 ${key}:`);
+        console.log("  Content:", DEMO_SCRIPTS[key].content);
+        console.log("  Hash:", DEMO_SCRIPTS[key].hash);
+      });
+      console.log('\n💡 Usage: window.hashTest.testHash("hello")');
+    },
+
+    // Calculate hash for custom code
+    calcHash: async (code) => {
+      const hash = await calculateHashHelper(code);
+      console.log("📝 Code:", code);
+      console.log("🔐 Hash:", hash);
+      console.log("💡 Add to CSP: script-src '" + hash + "'");
+      return hash;
+    },
+
+    // Get all hashes as object
+    getHashes: () => {
+      return DEMO_SCRIPTS;
+    },
+  };
+
+  console.log("🎯 Hash Test Helper loaded! (Vercel compatible)");
+  console.log('Try: window.hashTest.testHash("pass")');
+  console.log("Or:  window.hashTest.showAll()");
+}
+
 const HashNonceDemo = () => {
   const [currentNonce, setCurrentNonce] = useState("");
   const [testResults, setTestResults] = useState([]);
@@ -484,74 +541,83 @@ const HashNonceDemo = () => {
         <h3>📚 Hướng Dẫn Sử Dụng</h3>
 
         <div className="info-card console-test-card">
-          <h4>💻 Test Nonce từ Console</h4>
-          <p>Copy và paste các lệnh sau vào Developer Console (F12):</p>
+          <h4>🎯 Test Hash trên Vercel (Console F12)</h4>
+          <p>Dùng helper functions - hoạt động trên static hosting!</p>
 
           <div className="console-section">
             <p className="console-section-title">
-              1. Lấy nonce từ CSP error message:
+              ⭐ Test với Hash Cố Định (Vercel Compatible)
             </p>
             <code className="console-code">
-              // Trigger CSP violation và lấy nonce
+              // 1. Test hash "pass" (recommended for demo)
+              <br />
+              window.hashTest.testHash('pass')
+              <br />
+              <br />
+              // 2. Test hash "hello"
+              <br />
+              window.hashTest.testHash('hello')
+              <br />
+              <br />
+              // 3. Test hash "alert"
+              <br />
+              window.hashTest.testHash('alert')
+              <br />
+              <br />
+              // 4. Xem tất cả hash có sẵn
+              <br />
+              window.hashTest.showAll()
+              <br />
+              <br />
+              // 5. Tính hash cho code tùy chỉnh
+              <br />
+              await window.hashTest.calcHash("console.log('test')")
+            </code>
+
+            <p className="console-section-title">
+              📋 Các Hash Cố Định (thêm vào backend CSP):
+            </p>
+            <code className="console-code">
+              // Hash 1: Pass Test
+              <br />
+              {DEMO_SCRIPTS.pass.hash}
+              <br />
+              <br />
+              // Hash 2: Hello
+              <br />
+              {DEMO_SCRIPTS.hello.hash}
+              <br />
+              <br />
+              // Hash 3: Alert
+              <br />
+              {DEMO_SCRIPTS.alert.hash}
+              <br />
+              <br />
+              // Thêm vào backend: cspMiddleware.js
+              <br />
+              script-src 'self' '{DEMO_SCRIPTS.pass.hash}'
+            </code>
+
+            <p className="console-section-title">
+              🔧 Test thủ công (không cần helper):
+            </p>
+            <code className="console-code">
+              // Script này sẽ PASS nếu hash đã thêm vào CSP
               <br />
               const s = document.createElement('script');
               <br />
-              s.textContent = '// test';
+              s.textContent = "{DEMO_SCRIPTS.pass.content}";
               <br />
               document.head.appendChild(s);
               <br />
-              // Xem console error → copy nonce từ message
               <br />
-              // Ví dụ: 'nonce-7++0UYfwS8Urr/s581IIFA=='
-            </code>
-
-            <p style={{ fontWeight: "bold", marginBottom: "5px" }}>
-              📋 Hoặc copy nonce từ ô "Current Nonce" ở trên ↑
-            </p>
-
-            <p className="console-section-title">
-              2. Sử dụng helper functions (dễ nhất):
-            </p>
-            <code className="console-code">
-              // Lấy nonce
+              // Script này sẽ FAIL (không có hash trong CSP)
               <br />
-              const nonce = window.getCSPNonce();
+              const s2 = document.createElement('script');
               <br />
+              s2.textContent = "console.log('blocked!')";
               <br />
-              // Test ngay với nonce hiện tại
-              <br />
-              window.testCSPNonce();
-              <br />
-              <br />
-              // Hoặc test với nonce tùy chỉnh
-              <br />
-              window.testCSPNonce('7++0UYfwS8Urr/s581IIFA==');
-            </code>
-
-            <p className="console-section-title">3. Test script thủ công:</p>
-            <code className="console-code">
-              const nonce = window.getCSPNonce();
-              <br />
-              const s = document.createElement('script');
-              <br />
-              s.setAttribute('nonce', nonce);
-              <br />
-              s.textContent = "alert('✅ Works!');";
-              <br />
-              document.documentElement.appendChild(s);
-            </code>
-
-            <p className="console-section-title">
-              4. Test script không có nonce (bị chặn):
-            </p>
-            <code className="console-code">
-              const s = document.createElement('script');
-              <br />
-              s.textContent = "alert('Should NOT show!');";
-              <br />
-              document.documentElement.appendChild(s);
-              <br />
-              // → CSP sẽ chặn và hiện nonce trong error message
+              document.head.appendChild(s2);
             </code>
           </div>
         </div>
