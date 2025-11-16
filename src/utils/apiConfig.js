@@ -1,6 +1,16 @@
 // frontend/src/utils/apiConfig.js
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5000";
-const SOCKET_URL = process.env.REACT_APP_SOCKET_URL || API_BASE_URL;
+// Auto-detect production environment
+const isProduction =
+  window.location.hostname.includes("vercel.app") ||
+  process.env.NODE_ENV === "production";
+
+const API_BASE_URL =
+  process.env.REACT_APP_API_URL ||
+  (isProduction ? "https://suli-coffee.onrender.com" : "http://localhost:5000");
+
+const SOCKET_URL =
+  process.env.REACT_APP_SOCKET_URL ||
+  (isProduction ? "https://suli-coffee.onrender.com" : API_BASE_URL);
 
 export { API_BASE_URL, SOCKET_URL };
 

@@ -99,8 +99,26 @@ export const CSPProvider = ({ children }) => {
     window.addEventListener("csp-pass", handlePass);
 
     // Connect to Socket.IO for CSP monitoring
-    const backendUrl =
-      process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
+    // Auto-detect production environment
+    const isProduction =
+      window.location.hostname.includes("vercel.app") ||
+      window.location.hostname.includes("suli-coffee-web") ||
+      process.env.NODE_ENV === "production";
+
+    // Determine backend URL with production-first priority
+    let backendUrl = "http://localhost:5000"; // Default for development
+
+    if (isProduction) {
+      backendUrl = "https://suli-coffee.onrender.com";
+    }
+
+    // Override with environment variable if set
+    if (process.env.REACT_APP_BACKEND_URL) {
+      backendUrl = process.env.REACT_APP_BACKEND_URL;
+    }
+
+    console.log("🔌 CSP Socket connecting to:", backendUrl, { isProduction });
+
     const socketConnection = io(backendUrl, {
       transports: ["websocket", "polling"],
       withCredentials: true,
