@@ -5,6 +5,10 @@ import { useDispatch } from "react-redux";
 import { login } from "./redux/userSlice";
 import { jwtDecode } from "jwt-decode";
 
+// CSP Components
+import CSPProvider from "./components/CSP/CSPProvider";
+import CSPDashboard from "./components/CSP/CSPDashboard";
+
 // user pages
 import Home from "./pages/user/Home";
 import Login from "./pages/user/Login";
@@ -31,7 +35,6 @@ import Stores from "./pages/user/StoresUser";
 import VnpayReturn from "./pages/user/VnpayReturn";
 import About from "./pages/user/About";
 import Contact from "./pages/user/Contact";
-import CSPDemo from "./pages/CSPDemo";
 
 // admin pages
 import AdminDashboard from "./pages/admin/AdminDashboard";
@@ -100,130 +103,134 @@ function App() {
   }, [dispatch]);
 
   return (
-    <Routes>
-      {/* Auth routes */}
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/email-verified" element={<EmailVerified />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
+    <CSPProvider>
+      <Routes>
+        {/* CSP Dashboard route */}
+        <Route path="/csp-dashboard" element={<CSPDashboard />} />
 
-      {/* User routes */}
-      <Route path="/" element={<UserLayout />}>
-        <Route index element={<Home />} />
-        <Route path="products" element={<ProductList />} />
-        <Route path="product/:id" element={<ProductDetail />} />
-        <Route path="cart" element={<Cart />} />
-        <Route
-          path="checkout"
-          element={
-            <PrivateRoute>
-              <Checkout />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="qr-payment"
-          element={
-            <PrivateRoute>
-              <QRPayment />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="successful"
-          element={
-            <PrivateRoute>
-              <Successful />
-            </PrivateRoute>
-          }
-        />
-        <Route path="stores" element={<Stores />} />
-        <Route path="/vnpay-return" element={<VnpayReturn />} />
-        <Route path="about" element={<About />} />
-        <Route path="contact" element={<Contact />} />
-        <Route path="csp-demo" element={<CSPDemo />} />
+        {/* Auth routes */}
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/email-verified" element={<EmailVerified />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
-        {/* Profile routes */}
-        <Route
-          path="profile"
-          element={
-            <PrivateRoute>
-              <Profile />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="profile/info"
-          element={
-            <PrivateRoute>
-              <ProfileInfo />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="profile/orders"
-          element={
-            <PrivateRoute>
-              <OrdersList />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="profile/vouchers"
-          element={
-            <PrivateRoute>
-              <Vouchers />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="profile/notifications"
-          element={
-            <PrivateRoute>
-              <Notifications />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="profile/help"
-          element={
-            <PrivateRoute>
-              <Help />
-            </PrivateRoute>
-          }
-        />
-      </Route>
+        {/* User routes */}
+        <Route path="/" element={<UserLayout />}>
+          <Route index element={<Home />} />
+          <Route path="products" element={<ProductList />} />
+          <Route path="product/:id" element={<ProductDetail />} />
+          <Route path="cart" element={<Cart />} />
+          <Route
+            path="checkout"
+            element={
+              <PrivateRoute>
+                <Checkout />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="qr-payment"
+            element={
+              <PrivateRoute>
+                <QRPayment />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="successful"
+            element={
+              <PrivateRoute>
+                <Successful />
+              </PrivateRoute>
+            }
+          />
+          <Route path="stores" element={<Stores />} />
+          <Route path="/vnpay-return" element={<VnpayReturn />} />
+          <Route path="about" element={<About />} />
+          <Route path="contact" element={<Contact />} />
 
-      {/* Admin routes */}
-      <Route path="/admin" element={<AdminLayout />}>
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="food" element={<Food />} />
-        <Route path="food/add" element={<AddFood />} />
-        <Route path="food/edit/:id" element={<EditFood />} />
-        <Route path="category" element={<Category />} />
-        <Route path="category/add" element={<CategoryAdd />} />
-        <Route path="category/edit/:id" element={<CategoryEdit />} />
-        <Route path="ingredient" element={<Ingredient />} />
-        <Route path="ingredient/add" element={<AddIngredient />} />
-        <Route path="ingredient/edit/:id" element={<EditIngredient />} />
-        <Route path="export" element={<ExportIngredient />} />
-        <Route path="payment" element={<Payment />} />
-        <Route path="payment/add" element={<AddPayment />} />
-        <Route path="payment/edit/:id" element={<EditPayment />} />
-        <Route path="users" element={<UserList />} />
-        <Route path="staff" element={<Staff />} />
-        <Route path="staff/add" element={<AddStaff />} />
-        <Route path="staff/edit/:id" element={<EditStaff />} />
-        <Route path="invoice" element={<Invoice />} />
-        <Route path="order" element={<Order />} />
-        <Route path="revenue" element={<RevenueReport />} />
-        <Route path="bestseller" element={<BestsellerReport />} />
-        <Route path="voucher" element={<Voucher />} />
-        <Route path="voucher/assign" element={<AssignVoucher />} />
-        <Route path="voucher/list" element={<VoucherList />} />
-      </Route>
-    </Routes>
+          {/* Profile routes */}
+          <Route
+            path="profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="profile/info"
+            element={
+              <PrivateRoute>
+                <ProfileInfo />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="profile/orders"
+            element={
+              <PrivateRoute>
+                <OrdersList />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="profile/vouchers"
+            element={
+              <PrivateRoute>
+                <Vouchers />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="profile/notifications"
+            element={
+              <PrivateRoute>
+                <Notifications />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="profile/help"
+            element={
+              <PrivateRoute>
+                <Help />
+              </PrivateRoute>
+            }
+          />
+        </Route>
+
+        {/* Admin routes */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="food" element={<Food />} />
+          <Route path="food/add" element={<AddFood />} />
+          <Route path="food/edit/:id" element={<EditFood />} />
+          <Route path="category" element={<Category />} />
+          <Route path="category/add" element={<CategoryAdd />} />
+          <Route path="category/edit/:id" element={<CategoryEdit />} />
+          <Route path="ingredient" element={<Ingredient />} />
+          <Route path="ingredient/add" element={<AddIngredient />} />
+          <Route path="ingredient/edit/:id" element={<EditIngredient />} />
+          <Route path="export" element={<ExportIngredient />} />
+          <Route path="payment" element={<Payment />} />
+          <Route path="payment/add" element={<AddPayment />} />
+          <Route path="payment/edit/:id" element={<EditPayment />} />
+          <Route path="users" element={<UserList />} />
+          <Route path="staff" element={<Staff />} />
+          <Route path="staff/add" element={<AddStaff />} />
+          <Route path="staff/edit/:id" element={<EditStaff />} />
+          <Route path="invoice" element={<Invoice />} />
+          <Route path="order" element={<Order />} />
+          <Route path="revenue" element={<RevenueReport />} />
+          <Route path="bestseller" element={<BestsellerReport />} />
+          <Route path="voucher" element={<Voucher />} />
+          <Route path="voucher/assign" element={<AssignVoucher />} />
+          <Route path="voucher/list" element={<VoucherList />} />
+        </Route>
+      </Routes>
+    </CSPProvider>
   );
 }
 
