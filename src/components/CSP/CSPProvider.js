@@ -166,7 +166,17 @@ export const CSPProvider = ({ children }) => {
         }
       }
 
-      // Method 3: Try meta tag
+      // Method 3: Extract from existing script tags with nonce
+      const scripts = document.querySelectorAll("script[nonce]");
+      if (scripts.length > 0) {
+        const nonce = scripts[0].getAttribute("nonce");
+        if (nonce && nonce !== "__NONCE__") {
+          window.__cspNonce = nonce;
+          return nonce;
+        }
+      }
+
+      // Method 4: Try meta tag
       const meta = document.querySelector('meta[name="csp-nonce"]');
       if (meta) {
         const nonce = meta.getAttribute("content");
