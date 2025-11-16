@@ -110,15 +110,20 @@
   background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
   color: #fff;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
   margin-right: 6px;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(0, 123, 255, 0.3);
   position: relative;
   z-index: 1;
+  min-width: 70px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-blue:hover {
@@ -130,14 +135,19 @@
   background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
   color: #fff;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(220, 53, 69, 0.3);
   position: relative;
   z-index: 1;
+  min-width: 70px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-red:hover {
@@ -169,14 +179,19 @@
   background: #adb5bd;
   color: #fff;
   border: none;
-  padding: 8px 12px;
+  padding: 8px 16px;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 14px;
+  font-size: 13px;
+  font-weight: 500;
   transition: all 0.3s ease;
   margin-right: 6px;
   position: relative;
   z-index: 1;
+  min-width: 70px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-toggle:hover {

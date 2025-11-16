@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import { FaSave, FaTimes } from "react-icons/fa";
+import { buildApiUrl } from "../../../utils/apiConfig"; // ✅ FIX: Import buildApiUrl
 import "../../../styles/components/admin/AddIngredient.css";
 
 const FormField = ({ label, error, children }) => (
@@ -29,11 +30,12 @@ const AddIngredient = () => {
     SoLuong: (v) =>
       v === "" || v === null
         ? "Số lượng không được để trống"
-        : v <= 0
+        : parseInt(v) <= 0
         ? "Số lượng phải lớn hơn 0"
         : null,
     PhanLoai: (v) => (!v.trim() ? "Phân loại không được để trống" : null),
-    ImageFile: (v) => (!v ? "Bạn phải chọn ảnh nguyên liệu" : null),
+    ImageFile: (v) =>
+      v === null ? null : !v ? "Bạn phải chọn ảnh nguyên liệu" : null, // ✅ Làm optional, chỉ error nếu bắt buộc (nhưng hiện optional)
   };
 
   const validateField = (name, value) => rules[name]?.(value) || null;
@@ -42,7 +44,7 @@ const AddIngredient = () => {
     const newErrors = {};
     Object.keys(rules).forEach((key) => {
       let value = form[key];
-      if (key === "ImageFile") value = imageFile; // validate ảnh riêng
+      if (key === "ImageFile") value = imageFile;
       const msg = validateField(key, value);
       if (msg) newErrors[key] = msg;
     });
@@ -59,6 +61,14 @@ const AddIngredient = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
+
+    // ✅ THÊM: Realtime validate cho SoLuong (tương tự edit)
+    if (name === "SoLuong") {
+      setErrors((prev) => ({
+        ...prev,
+        SoLuong: validateField("SoLuong", value),
+      }));
+    }
   };
 
   const handleImageChange = (e) => {
@@ -128,12 +138,39 @@ const AddIngredient = () => {
         );
       }
     } catch (err) {
-      // Nếu server trả về lỗi hợp lệ
-      if (err.response && err.response.data && err.response.data.message) {
-        Swal.fire("", err.response.data.message, "error");
+      console.error("❌ Lỗi thêm nguyên liệu:", err);
+
+      // ✅ FIX: Xử lý lỗi chi tiết như editFood (400 validation/duplicate, 401 auth, etc.)
+      if (err.response) {
+        const { status, data } = err.response;
+        const errorMsg = data?.message || "Lỗi không xác định từ server";
+
+        if (status === 400) {
+          // Lỗi validation/duplicate từ backend (ví dụ: tên trùng)
+          Swal.fire("", errorMsg, "error");
+
+          // Bonus: Set error cho field cụ thể nếu backend chỉ rõ
+          if (errorMsg.includes("Tên nguyên liệu")) {
+            setErrors((prev) => ({ ...prev, IngredientName: errorMsg }));
+          }
+        } else if (status === 401) {
+          Swal.fire(
+            "",
+            "Phiên đăng nhập hết hạn. Vui lòng đăng nhập lại!",
+            "warning"
+          );
+          // Có thể redirect: window.location.href = "/login";
+        } else if (status >= 500) {
+          Swal.fire("", "Lỗi server. Vui lòng thử lại sau!", "error");
+        } else {
+          Swal.fire("", errorMsg, "error");
+        }
+      } else if (err.request) {
+        // Không kết nối được server (network error)
+        Swal.fire("", "Không thể kết nối server! Kiểm tra mạng.", "error");
       } else {
-        console.error("❌ Lỗi thêm nguyên liệu:", err);
-        Swal.fire("", "Không thể kết nối server!", "error");
+        // Lỗi khác (config axios)
+        Swal.fire("", "Đã xảy ra lỗi không mong muốn!", "error");
       }
     }
   };

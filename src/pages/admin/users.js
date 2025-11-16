@@ -20,9 +20,22 @@ const UserList = () => {
       const res = await axios.get(buildApiUrl("/api/admin/users"), {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
-      setUsers(res.data.data || []);
+      let fetchedUsers = res.data.data || [];
+
+      // ✅ THÊM: Optional frontend filter (backup nếu backend fail) – Exclude Role="admin"
+      fetchedUsers = fetchedUsers.filter(
+        (u) => u.Role !== "admin" && u.Role !== "Admin"
+      );
+
+      console.log(
+        "🔍 Fetched & filtered users:",
+        fetchedUsers.map((u) => ({ Id: u.Id, Role: u.Role }))
+      ); // Debug
+
+      setUsers(fetchedUsers);
     } catch (err) {
       console.error("❌ Lỗi khi fetch users:", err);
+      Swal.fire("Lỗi", "Không thể tải danh sách users", "error");
     }
   };
 
@@ -47,9 +60,9 @@ const UserList = () => {
         try {
           setLoadingId(id);
 
-          const url = buildApiUrl(
-            `/api/admin/users/${id}/${action === "block" ? "block" : "unblock"}`
-          );
+          // ✅ FIX: Sửa URL – Dùng isBanned thay action (undefined)
+          const endpoint = isBanned ? "unban" : "ban";
+          const url = buildApiUrl(`/api/admin/users/${id}/${endpoint}`);
 
           const res = await axios.patch(url, null, {
             headers: {
@@ -78,12 +91,13 @@ const UserList = () => {
             });
           }
         } catch (err) {
+          console.error("❌ Lỗi toggle ban:", err);
           Swal.fire({
             icon: "error",
             title: "",
-            text: "Không thể kết nối server",
+            text: err.response?.data?.message || "Không thể kết nối server",
             confirmButtonText: "OK",
-            timer: 1000,
+            timer: 1500,
             timerProgressBar: true,
           });
         } finally {

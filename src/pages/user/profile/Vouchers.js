@@ -100,11 +100,12 @@ export default function VoucherTab() {
         <p>{v.Description}</p>
         <p>
           <strong>Điều kiện:</strong> Đơn tối thiểu{" "}
-          {v.MinOrderAmount?.toLocaleString()}đ
+          {Math.round(v.MinOrderAmount || 0).toLocaleString("vi-VN")}₫
         </p>
         {v.DiscountAmount && (
           <p>
-            <strong>Giảm:</strong> {v.DiscountAmount.toLocaleString()}đ
+            <strong>Giảm:</strong>{" "}
+            {Math.round(v.DiscountAmount).toLocaleString("vi-VN")}₫
           </p>
         )}
         {v.DiscountPercentage && (

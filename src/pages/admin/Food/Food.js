@@ -161,7 +161,7 @@ const Food = () => {
                   : "Không có"}
               </td>
 
-              <td>{item.Price.toLocaleString()} đ</td>
+              <td>{Math.round(item.Price).toLocaleString("vi-VN")} ₫</td>
               <td>{item.Discount}</td>
               <td>{item.Status ? "Còn bán" : "Ngừng bán"}</td>
               <td>

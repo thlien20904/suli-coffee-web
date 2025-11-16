@@ -129,8 +129,8 @@ export default function ProductList() {
   const groupedProducts = groupByCategory(products);
 
   return (
-    <div className="container py-4">
-      <div className="fixed-search-bar">
+    <div className="container py-4"   style={{ marginTop: "-60px", paddingBottom: "2rem" }}  >
+      <div className="fixed-search-bar" >
         <Form onSubmit={handleSubmit} className="search-filter-form">
           <Row className="align-items-end">
             <Col md={5}>

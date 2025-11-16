@@ -371,7 +371,7 @@ export default function Cart() {
   return (
     <div
       className="container"
-      style={{ paddingTop: "100px", paddingBottom: "2rem" }}
+      style={{ paddingTop: "10px", paddingBottom: "2rem" }}
     >
       <h2 className="text-center mb-4">Giỏ hàng của bạn</h2>
       {cart.length === 0 ? (
@@ -413,12 +413,31 @@ export default function Cart() {
                     <img
                       src={
                         item.ImageURL
-                          ? `${API_BASE_URL}${item.ImageURL}`
+                          ? item.ImageURL.startsWith("http") // SỬA: Nếu full URL (http/https), dùng nguyên xi
+                            ? item.ImageURL
+                            : `${API_BASE_URL}${item.ImageURL}` // Nếu relative (bắt đầu bằng /images/...), mới thêm prefix
                           : PLACEHOLDER
                       }
                       alt={item.FoodName}
                       style={{ width: 90, height: 90 }}
                       className="img-thumbnail"
+                      onLoad={() =>
+                        console.log(
+                          `✅ IMAGE LOADED SUCCESS: ${item.FoodName} | FINAL SRC:`,
+                          item.ImageURL
+                        )
+                      } // GIỮ: Log thành công
+                      onError={(e) => {
+                        console.error(
+                          `❌ IMAGE LOAD FAILED: ${item.FoodName} | FINAL SRC:`,
+                          e.target.src,
+                          "| ORIG URL:",
+                          item.ImageURL,
+                          "| EVENT:",
+                          e.nativeEvent
+                        ); // SỬA: Log FINAL SRC để debug chính xác
+                        e.target.src = PLACEHOLDER; // Fallback
+                      }}
                     />
                   </td>
                   <td style={{ minWidth: 200 }}>{item.FoodName}</td>

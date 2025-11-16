@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { buildApiUrl } from "../../../utils/apiConfig";
+import { buildApiUrl } from "../../../utils/apiConfig"; // ✅ Đã có, giữ nguyên
 import Swal from "sweetalert2";
 import { useNavigate } from "react-router-dom";
 import "../../../styles/components/admin/AddCategory.css";
@@ -13,14 +13,14 @@ const AddPayment = () => {
     e.preventDefault();
 
     if (!name.trim()) {
-      Swal.fire("", "Tên phương thức không được để trống", "error");
+      Swal.fire("", "Tên phương thức không được để trống.", "error");
       return;
     }
 
     try {
       const res = await axios.post(
         buildApiUrl("/api/admin/payment/add"),
-        { TenPhuongThuc: name },
+        { TenPhuongThuc: name.trim() },
         {
           headers: {
             "Content-Type": "application/json",
@@ -40,11 +40,12 @@ const AddPayment = () => {
           navigate("/admin/payment");
         });
       } else {
-        Swal.fire("", res.data.message || "Không thể thêm", "error");
+        Swal.fire("", res.data.message || "Không thể thêm.", "error");
       }
     } catch (err) {
       console.error("❌ Lỗi khi thêm:", err.response || err);
-      Swal.fire("", "Không thể thêm phương thức", "error");
+      const msg = err.response?.data?.message || "Không thể thêm phương thức thanh toán.";
+      Swal.fire("", msg, "error"); // ✅ FIX: Hiển thị message backend rõ ràng (e.g., "Tên phương thức đã tồn tại.")
     }
   };
 

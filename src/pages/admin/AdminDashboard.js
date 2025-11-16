@@ -64,7 +64,10 @@ const AdminDashboard = () => {
     recentOrders,
   } = data;
 
-  console.log("📊 Dashboard data:", { monthlySales, totalSales }); // Debug log
+  // ✅ THÊM: Debug log cho bestSellers và lowStockIngredients
+  // console.log("🔥 BestSellers data:", bestSellers); // Check array và ImageURL
+  // console.log("⚠️ LowStockIngredients data:", lowStockIngredients); // Tương tự
+  // console.log("📊 Dashboard data:", { monthlySales, totalSales }); // Debug log
 
   // Ensure monthlySales exists and has proper format
   const safelyMonthlySales = monthlySales || [];
@@ -176,6 +179,19 @@ const AdminDashboard = () => {
     },
   };
 
+  // ✅ Helper function để lấy img src an toàn (fallback nếu null hoặc double URL)
+  const safeImageUrl = (imageUrl) => {
+    if (!imageUrl) return "/images/no-image.png";
+
+    // Nếu double URL (detect 'http://localhost:5000https://'), extract phần sau
+    if (imageUrl.includes("http://localhost:5000https://")) {
+      console.warn("⚠️ Detected double URL, fixing:", imageUrl);
+      return imageUrl.replace("http://localhost:5000", ""); // Bỏ prefix local
+    }
+
+    return getImageUrl(imageUrl); // Gọi utils nếu OK
+  };
+
   return (
     <div className="container admin-dashboard mt-4">
       {/* Thống kê */}
@@ -213,7 +229,9 @@ const AdminDashboard = () => {
         <div className="col-md-3">
           <div className="card text-center p-3 bg-light">
             <h5>💰 Tổng doanh thu</h5>
-            <p className="display-6">{totalSales.toLocaleString()} VND</p>
+            <p className="display-6">
+              {Math.round(totalSales).toLocaleString("vi-VN")} ₫
+            </p>
           </div>
         </div>
       </div>
@@ -290,51 +308,66 @@ const AdminDashboard = () => {
         </div>
       </section>
 
-      {/* Top sản phẩm + quốc gia */}
+      {/* Top sản phẩm + địa chỉ */}
       <div className="row mt-5">
         <div className="col-md-6">
           <h3 className="text-center">🔥 Sản phẩm bán chạy 🔥</h3>
           <div className="row">
-            {bestSellers.length > 0 ? (
+            {bestSellers && bestSellers.length > 0 ? (
               bestSellers.map((item, i) => (
                 <div className="col-md-4 mb-3" key={i}>
                   <div className="card text-center p-3 bg-light">
                     <img
-                      src={getImageUrl(item.ImageURL)}
+                      src={safeImageUrl(item.ImageURL)} // ✅ Sử dụng safeImageUrl
                       alt={item.FoodName}
+                      onError={(e) => {
+                        // ✅ onError fallback
+                        console.error(
+                          "❌ BestSeller image fail:",
+                          item.FoodName,
+                          item.ImageURL
+                        );
+                        e.target.src = "/images/no-image.png";
+                      }}
                       style={{
                         maxWidth: "100%",
                         height: "150px",
                         objectFit: "cover",
+                        borderRadius: "8px",
                       }}
+                      className="img-fluid"
                     />
-                    <h5>{item.FoodName}</h5>
+                    <h5 className="mt-2">{item.FoodName}</h5>
                     <p style={{ color: "#C19A6B", fontWeight: "bold" }}>
-                      {item.Price.toLocaleString()}đ
+                      {Math.round(parseFloat(item.Price || 0)).toLocaleString(
+                        "vi-VN"
+                      )}
+                      ₫
                     </p>
-                    <p>Đã bán: {item.TotalSold}</p>
+                    <p>Đã bán: {item.TotalSold || 0}</p>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-center text-danger">Không có dữ liệu</p>
+              <p className="text-center text-danger">
+                Không có dữ liệu sản phẩm bán chạy
+              </p>
             )}
           </div>
         </div>
 
         <div className="col-md-6">
-          <h3 className="text-center">📍 Top địa chỉ đặt hàng</h3>{" "}
-          {/* ✅ Đổi tiêu đề */}
+          <h3 className="text-center">📍 Top địa chỉ đặt hàng</h3>
           <ul className="list-group">
-            {topAddresses.length > 0 ? (
+            {topAddresses && topAddresses.length > 0 ? (
               topAddresses.map((addr, i) => (
                 <li
                   key={i}
                   className="list-group-item d-flex justify-content-between align-items-center"
                 >
-                  {addr.Address}
+                  {addr.Address || "N/A"}
                   <span className="badge bg-primary rounded-pill">
-                    {addr.OrderCount}
+                    {addr.OrderCount || 0}
                   </span>
                 </li>
               ))
@@ -352,32 +385,24 @@ const AdminDashboard = () => {
           <table className="table table-bordered">
             <thead>
               <tr>
-                <th>
-                  <span>ID</span>
-                </th>
-                <th>
-                  <span>Người dùng</span>
-                </th>
-                <th>
-                  <span>Trạng thái</span>
-                </th>
-                <th>
-                  <span>Ngày đặt</span>
-                </th>
-                <th>
-                  <span>Tổng tiền</span>
-                </th>
+                <th>ID</th>
+                <th>Người dùng</th>
+                <th>Trạng thái</th>
+                <th>Ngày đặt</th>
+                <th>Tổng tiền</th>
               </tr>
             </thead>
             <tbody>
-              {recentOrders.length > 0 ? (
+              {recentOrders && recentOrders.length > 0 ? (
                 recentOrders.map((o, i) => (
                   <tr key={i}>
                     <td>{o.OrderId}</td>
                     <td>{o.FullName}</td>
                     <td>{o.StatusName}</td>
                     <td>{new Date(o.OrderDate).toLocaleString()}</td>
-                    <td>{o.TotalAmount.toLocaleString()}đ</td>
+                    <td>
+                      {Math.round(o.TotalAmount).toLocaleString("vi-VN")}₫
+                    </td>
                   </tr>
                 ))
               ) : (
@@ -397,36 +422,49 @@ const AdminDashboard = () => {
           <table className="table table-bordered">
             <thead>
               <tr>
-                <th>
-                  <span>Hình ảnh</span>
-                </th>
-                <th>
-                  <span>Tên</span>
-                </th>
-                <th>
-                  <span>Số lượng</span>
-                </th>
+                <th>Hình ảnh</th>
+                <th>Tên</th>
+                <th>Số lượng</th>
               </tr>
             </thead>
             <tbody>
-              {lowStockIngredients.length > 0 ? (
+              {lowStockIngredients && lowStockIngredients.length > 0 ? (
                 lowStockIngredients.map((item, i) => (
                   <tr key={i}>
                     <td>
                       <img
-                        src={getImageUrl(item.ImageURL)}
+                        src={safeImageUrl(item.ImageURL)} // ✅ Sử dụng safeImageUrl
                         alt={item.IngredientName}
-                        className="ingredient-img"
+                        onError={(e) => {
+                          // ✅ onError fallback
+                          console.error(
+                            "❌ LowStock image fail:",
+                            item.IngredientName,
+                            item.ImageURL
+                          );
+                          e.target.src = "/images/no-image.png";
+                        }}
+                        className="ingredient-img img-fluid"
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          objectFit: "cover",
+                          borderRadius: "4px",
+                        }}
                       />
                     </td>
                     <td>{item.IngredientName}</td>
-                    <td>{item.SoLuong}</td>
+                    <td>
+                      <span className="badge bg-warning">
+                        {item.SoLuong || 0}
+                      </span>
+                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
                   <td colSpan="3" className="text-center">
-                    Không có dữ liệu
+                    Không có nguyên liệu sắp hết
                   </td>
                 </tr>
               )}

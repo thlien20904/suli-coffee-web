@@ -60,7 +60,9 @@ const EditFood = () => {
           FoodName: foodData.FoodName,
           CategoryId: foodData.CategoryId || "",
           Ingredients: (foodData.Ingredients || []).map((i) => i.IngredientId),
-          Price: foodData.Price || "",
+          Price: foodData.Price
+            ? parseInt(foodData.Price).toLocaleString("vi-VN")
+            : "",
           Discount: foodData.Discount || 0,
           Stock: foodData.Stock || "",
           Description: foodData.Description || "",
@@ -119,7 +121,19 @@ const EditFood = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    const newForm = { ...form, [name]: value };
+    let processedValue = value;
+
+    // Xử lý format tiền cho Price
+    if (name === "Price") {
+      const numericValue = value.replace(/[^0-9]/g, "");
+      if (numericValue) {
+        processedValue = parseInt(numericValue).toLocaleString("vi-VN");
+      } else {
+        processedValue = "";
+      }
+    }
+
+    const newForm = { ...form, [name]: processedValue };
     setForm(newForm);
 
     if (name === "Stock") {
@@ -180,9 +194,14 @@ const EditFood = () => {
 
     const formData = new FormData();
     Object.keys(form).forEach((key) => {
+      let value = form[key];
+      // Chuyển Price về số trước khi gửi
+      if (key === "Price") {
+        value = parseInt(value.replace(/[^0-9]/g, "")) || 0;
+      }
       formData.append(
         key,
-        key === "Ingredients" ? JSON.stringify(form[key]) : form[key]
+        key === "Ingredients" ? JSON.stringify(form[key]) : value
       );
     });
     if (imageFile) formData.append("ImageFile", imageFile);
@@ -251,7 +270,7 @@ const EditFood = () => {
   // ================= FIELDS CONFIG =================
   const fields = [
     { name: "FoodName", label: "Tên món", type: "text" },
-    { name: "Price", label: "Giá", type: "number", min: 1 },
+    { name: "Price", label: "Giá", type: "text" },
     {
       name: "Discount",
       label: "Giảm giá (%)",
