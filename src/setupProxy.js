@@ -28,7 +28,7 @@ module.exports = function (app) {
 
     const csp = [
       "default-src 'self'",
-      `script-src 'self' 'nonce-${nonce}' https://accounts.google.com https://*.googleapis.com https://cdnjs.cloudflare.com`,
+      `script-src 'self' 'nonce-${nonce}' 'sha256-7KeYHLqXdC8kKKqmVYS0d4v1Y7eG5vC5qv+T0rJ1w1M=' 'sha256-BKU8tKGd0KZuZtZW7c8Qpe3gvmFJ9cJdVe3v3tZyGbI=' 'sha256-R8TqFr7hL0qK3Y9F8K5Nc9L3hV7F8qRz0Td1cM2QzN4=' 'sha256-MkOXeVUvzUUKopAOP0RVNWc3wADitnaZbMMh2TTTdbE=' https://accounts.google.com https://*.googleapis.com https://cdnjs.cloudflare.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "img-src * data: blob:",
       "connect-src 'self' https://accounts.google.com https://*.googleapis.com http://localhost:5000 ws://localhost:5000",

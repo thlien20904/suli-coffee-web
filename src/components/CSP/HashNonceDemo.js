@@ -26,6 +26,63 @@ const calculateHashHelper = async (scriptContent) => {
   return `sha256-${btoa(String.fromCharCode(...new Uint8Array(hashBuffer)))}`;
 };
 
+// ⭐ Global test results storage (available even before component mounts)
+if (typeof window !== "undefined") {
+  window.__hashTestResults = window.__hashTestResults || [];
+  window.__hashTestListeners = window.__hashTestListeners || [];
+
+  // Helper to add result (works before component mounts)
+  window.__addHashTestResult = (key, success) => {
+    const script = DEMO_SCRIPTS[key];
+    if (!script) return;
+
+    const timestamp = new Date().toLocaleTimeString();
+
+    const result = {
+      id: Date.now(),
+      test: `Console Hash Test (${key})`,
+      success: success,
+      message: success
+        ? `✅ Script executed with hash: ${script.hash.substring(0, 30)}...`
+        : `❌ Script blocked. Hash: ${script.hash.substring(0, 30)}...`,
+      timestamp: timestamp,
+    };
+
+    window.__hashTestResults.push(result);
+    console.log("📊 Result saved to window.__hashTestResults");
+
+    // ⭐ Dispatch event để CSPProvider bắt được (giống như testCSPNonce)
+    if (success) {
+      const passEvent = new CustomEvent("csp-pass", {
+        detail: {
+          id: `hash-test-${Date.now()}-${Math.random()}`,
+          "document-uri": window.location.href,
+          "blocked-uri": "inline",
+          "violated-directive": "script-src",
+          "effective-directive": "script-src",
+          "original-policy": `script-src 'self' '${script.hash}'`,
+          disposition: "pass",
+          "script-sample": script.content.substring(0, 40) + "...",
+          "status-code": 200,
+          timestamp: timestamp,
+          "test-type": "hash-demo",
+          hash: script.hash,
+          key: key,
+        },
+      });
+
+      window.dispatchEvent(passEvent);
+      console.log("✅ Dispatched csp-pass event (Dashboard will receive)");
+    } else {
+      // Nếu fail thì CSP browser sẽ tự động fire securitypolicyviolation event
+      console.log("❌ Script blocked (CSP violation auto-fired)");
+    }
+
+    // Notify all listeners
+    window.__hashTestListeners.forEach((listener) => listener(result));
+  };
+}
+
 // ⭐ GLOBAL helper functions - available immediately in Console!
 if (typeof window !== "undefined") {
   window.hashTest = {
@@ -36,12 +93,33 @@ if (typeof window !== "undefined") {
         console.error("❌ Invalid key! Available:", Object.keys(DEMO_SCRIPTS));
         return;
       }
+
+      // Clear previous test flags
+      delete window.__hashTestPass;
+
       const s = document.createElement("script");
-      s.textContent = script.content;
+      s.textContent = script.content; // Use EXACT content for hash match
       document.head.appendChild(s);
+
       console.log("📝 Content:", script.content);
       console.log("🔐 Hash:", script.hash);
       console.log("💡 Add to backend CSP: script-src '" + script.hash + "'");
+
+      // Check result and log to UI
+      setTimeout(() => {
+        // Check if script executed (only 'pass' key sets window.__hashTestPass)
+        const success = key === "pass" ? window.__hashTestPass === true : true;
+
+        if (window.__addHashTestResult) {
+          window.__addHashTestResult(key, success);
+        }
+        console.log(
+          success
+            ? "✅ Test PASSED - Script executed!"
+            : "❌ Test FAILED - Script blocked by CSP"
+        );
+        delete window.__hashTestPass;
+      }, 100);
     },
 
     // Show all available hashes
@@ -226,6 +304,36 @@ const HashNonceDemo = () => {
       },
     ]);
   };
+
+  // ⭐ Load existing results and listen for new ones
+  useEffect(() => {
+    // Load any results that were added before component mounted
+    if (window.__hashTestResults && window.__hashTestResults.length > 0) {
+      console.log(
+        "📥 Loading",
+        window.__hashTestResults.length,
+        "existing test results"
+      );
+      setTestResults([...window.__hashTestResults]);
+    }
+
+    // Listen for new results (event-based, more reliable than polling)
+    const listener = (newResult) => {
+      console.log("📥 New result received:", newResult);
+      setTestResults((prev) => [...prev, newResult]);
+    };
+
+    window.__hashTestListeners.push(listener);
+    console.log("✅ HashNonceDemo mounted - listening for hash test results");
+
+    return () => {
+      // Remove listener on unmount
+      const index = window.__hashTestListeners.indexOf(listener);
+      if (index > -1) {
+        window.__hashTestListeners.splice(index, 1);
+      }
+    };
+  }, []);
 
   // Test 1: Inline script without nonce (should fail)
   const testInlineWithoutNonce = () => {
