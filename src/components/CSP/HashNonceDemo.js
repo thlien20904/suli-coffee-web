@@ -601,7 +601,7 @@ const HashNonceDemo = () => {
         </div>
 
         <div className="demo-hash-card">
-          <h4>📌 Demo Hash Cố Định (Cho Thầy)</h4>
+          <h4>📌 Demo Hash Cố Định </h4>
           <div className="demo-hash-content">
             <p>
               <strong>Content:</strong> <code>{DEMO_SCRIPTS.pass.content}</code>
