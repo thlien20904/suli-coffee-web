@@ -92,7 +92,7 @@ export default function Successful() {
           <FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />
           {error}
           <div className="mt-3">
-            <Button variant="primary" onClick={() => navigate("/profile")}>
+            <Button variant="primary" onClick={() => navigate("/profile/orders")}>
               Xem đơn hàng
             </Button>
             <Button
