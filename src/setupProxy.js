@@ -27,11 +27,12 @@ module.exports = function (app) {
     res.locals.nonce = nonce;
 
     const csp = [
-      "default-src 'self'",
+      "default-src 'self' blob:",
       `script-src 'self' 'nonce-${nonce}' 'sha256-7KeYHLqXdC8kKKqmVYS0d4v1Y7eG5vC5qv+T0rJ1w1M=' 'sha256-BKU8tKGd0KZuZtZW7c8Qpe3gvmFJ9cJdVe3v3tZyGbI=' 'sha256-R8TqFr7hL0qK3Y9F8K5Nc9L3hV7F8qRz0Td1cM2QzN4=' 'sha256-MkOXeVUvzUUKopAOP0RVNWc3wADitnaZbMMh2TTTdbE=' https://accounts.google.com https://*.googleapis.com https://cdnjs.cloudflare.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "img-src * data: blob:",
-      "connect-src 'self' https://accounts.google.com https://*.googleapis.com http://localhost:5000 ws://localhost:5000",
+      "media-src 'self' https://vhkvfmbmmsolqiwrjlxp.supabase.co https://*.supabase.co blob: data:",
+      "connect-src 'self' https://accounts.google.com https://*.googleapis.com http://localhost:5000 ws://localhost:5000 ws://localhost:3000 https://vhkvfmbmmsolqiwrjlxp.supabase.co",
       "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
       "object-src 'none'",
       "frame-ancestors 'self'",
@@ -43,7 +44,7 @@ module.exports = function (app) {
 
     // Đặt CSP headers - ENFORCED
     res.setHeader("Content-Security-Policy", csp);
-    res.setHeader("Content-Security-Policy-Report-Only", csp);
+    // res.setHeader("Content-Security-Policy-Report-Only", csp); // Tắt report-only để tránh duplicate warnings
     res.setHeader("X-Content-Type-Options", "nosniff");
     res.setHeader("X-Frame-Options", "DENY");
     res.setHeader("X-XSS-Protection", "1; mode=block");

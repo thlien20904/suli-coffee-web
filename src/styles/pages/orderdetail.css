@@ -1,0 +1,449 @@
+/* ===================================================
+   ORDER DETAIL PAGE STYLES - ENHANCED
+=================================================== */
+
+/* ---------------------------------------------------
+   WRAPPER
+--------------------------------------------------- */
+.order-detail-wrapper {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 30px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+  animation: fadeInUp 0.4s ease forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ---------------------------------------------------
+   HEADER / TITLE
+--------------------------------------------------- */
+.order-detail-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+}
+
+.order-detail-header h4 {
+  font-size: 24px;
+  font-weight: 700;
+  color: #333;
+}
+
+.order-detail-header .btn-secondary {
+  background: #f0f0f0;
+  border: none;
+  padding: 10px 18px;
+  border-radius: 8px;
+  font-weight: 500;
+  color: #555;
+  transition: 0.3s ease;
+}
+
+.order-detail-header .btn-secondary:hover {
+  background: #e0e0e0;
+}
+
+/* ---------------------------------------------------
+   INFO BOXES - SỬA: ĐỒNG NHẤT LIST ĐỨNG, KHÔNG Ô BỌC/HOVER, MÀU CHỮ TỰ NHIÊN, MỖI THỨ 1 HÀNG
+--------------------------------------------------- */
+.order-info-box {
+  display: flex;
+  flex-direction: column; /* Đứng dọc, mỗi item 1 hàng */
+  gap: 12px; /* Spacing đều */
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  margin-bottom: 30px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column; /* Label trên, value dưới */
+  padding: 8px 0;
+  border-bottom: 1px solid #f0f0f0; /* Đường nhẹ phân cách */
+}
+
+.info-item:last-child {
+  border-bottom: none; /* Bỏ đường cuối */
+}
+
+.info-item strong {
+  color: #555; /* Label xám nhẹ */
+  font-size: 14px;
+  margin-bottom: 2px;
+  font-weight: 600;
+}
+
+.info-item > span {
+  /* Value */
+  color: #333; /* Value đen đậm */
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+/* Status badges: Nhẹ, không hover, màu chữ tự nhiên */
+.status-badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  margin-top: 2px;
+  transition: none; /* Bỏ hover */
+}
+
+.status-badge.success {
+  background: rgba(40, 167, 69, 0.1);
+  color: #28a745;
+  border: 1px solid rgba(40, 167, 69, 0.2);
+}
+
+.status-badge.warning {
+  background: rgba(255, 193, 7, 0.1);
+  color: #856404;
+  border: 1px solid rgba(255, 193, 7, 0.2);
+}
+
+.status-badge.danger {
+  background: rgba(220, 53, 69, 0.1);
+  color: #721c24;
+  border: 1px solid rgba(220, 53, 69, 0.2);
+}
+
+/* ---------------------------------------------------
+   ADDRESS BOX
+--------------------------------------------------- */
+.order-address-box {
+  background: #fff7f6;
+  border: 1px solid #ffdad5;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.order-address-box h6 {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ff6f61;
+  margin-bottom: 8px;
+}
+
+.order-address-box p {
+  margin: 4px 0;
+  color: #555;
+  font-size: 14px;
+}
+
+/* ---------------------------------------------------
+   TIMELINE / PROGRESS STEPS - SỬA: ICON CHÍNH GIỮA THÀNH ĐỀU HƠN
+--------------------------------------------------- */
+.progress-timeline {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  margin: 30px 0;
+  align-items: center;
+  height: 70px; /* Height cố định để icon giữa thanh */
+}
+
+.progress-timeline::before {
+  content: "";
+  position: absolute;
+  top: 18px; /* Điều chỉnh để thanh ở giữa icon (icon height 36px / 2 = 18px) */
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 2px;
+  z-index: 1;
+}
+
+.progress-bar-fill {
+  position: absolute;
+  top: 18px; /* Đồng bộ với ::before */
+  left: 0;
+  height: 4px;
+  border-radius: 2px;
+  background: #ff6b35;
+  transition: width 0.4s ease;
+  z-index: 2;
+}
+
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  z-index: 3;
+  flex: 1;
+  padding: 0 5px; /* Thêm padding ngang để cân bằng */
+}
+
+.step-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  margin-bottom: 6px;
+  transition: all 0.3s ease;
+  position: relative; /* Icon overlay thanh */
+  z-index: 4; /* Cao hơn bar */
+}
+
+.step-label {
+  font-size: 12px;
+  text-align: center;
+  color: #666;
+  max-width: 80px;
+  line-height: 1.2;
+}
+
+.step.completed .step-icon {
+  background: #ff6b35;
+  color: #fff;
+  border-color: #ff6b35;
+}
+
+.step.completed .step-label {
+  color: #ff6b35;
+  font-weight: 500;
+}
+
+.step.failed .step-icon {
+  background: #dc3545;
+  color: #fff;
+  border-color: #dc3545;
+}
+
+.step.failed .step-label {
+  color: #dc3545;
+  font-weight: 500;
+}
+
+.step.pending .step-icon {
+  background: #fff;
+  color: #6c757d;
+  border-color: #e0e0e0;
+}
+
+.step.pending .step-label {
+  color: #999;
+}
+
+/* ---------------------------------------------------
+   PRODUCT TABLE
+--------------------------------------------------- */
+.table {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid #e6e6e6;
+  background: #fff;
+}
+
+.table thead {
+  background: #fff2ef;
+}
+
+.table thead th {
+  font-weight: 600;
+  color: #444;
+  padding: 14px 12px;
+  border-bottom: 1px solid #ffd8d2;
+}
+
+.table tbody td {
+  padding: 12px 12px;
+  color: #444;
+  border-bottom: 1px solid #f2f2f2;
+}
+
+.table tbody tr:hover {
+  background: #fafafa;
+}
+
+.table tfoot th {
+  background: #fff9f8;
+  padding: 14px 12px;
+  font-size: 16px;
+  color: #333;
+  border-top: 1px solid #ffd8d2;
+}
+
+.table tfoot .total-price {
+  color: #ff6f61;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ---------------------------------------------------
+   BUTTONS
+--------------------------------------------------- */
+.btn-warning {
+  background: #ffb547;
+  border: none;
+  padding: 10px 22px;
+  font-size: 15px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.btn-warning:hover {
+  background: #ff9f1c;
+}
+
+.btn-primary {
+  background: #ff6f61;
+  border: none;
+  padding: 10px 22px;
+  border-radius: 8px;
+  color: #fff;
+  font-weight: 600;
+  transition: 0.25s ease;
+}
+
+.btn-primary:hover {
+  background: #e8564a;
+}
+
+.btn-secondary {
+  transition: 0.3s ease;
+}
+
+/* ---------------------------------------------------
+   ALERTS
+--------------------------------------------------- */
+.alert {
+  border-radius: 12px !important;
+  padding: 20px;
+  font-size: 15px;
+}
+
+.alert-danger {
+  background: #ffe6e6 !important;
+  color: #cc2222 !important;
+  border: 1px solid #ffcccc !important;
+}
+
+/* ---------------------------------------------------
+   LOADING
+--------------------------------------------------- */
+.loading-text {
+  text-align: center;
+  font-size: 16px;
+  padding: 25px;
+  color: #666;
+}
+
+/* ---------------------------------------------------
+   BADGES - GIỮ NHẸ CHO STATUS
+--------------------------------------------------- */
+.status-badge {
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-weight: 500;
+  margin-top: 2px;
+  transition: none;
+}
+
+/* ---------------------------------------------------
+   RESPONSIVE
+--------------------------------------------------- */
+@media (max-width: 768px) {
+  .order-info-box {
+    gap: 10px;
+  }
+
+  .info-item {
+    padding: 6px 0;
+  }
+
+  .step-label {
+    font-size: 10px;
+    max-width: 60px;
+  }
+
+  .table thead th,
+  .table tbody td,
+  .table tfoot th {
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  .progress-timeline {
+    height: 80px;
+  }
+}
+/* ==============================
+   ORDER DETAIL - INFO BOX
+   Scoped CSS chỉ áp dụng trong OrderDetail
+============================== */
+.order-detail-wrapper .order-info-box {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  margin-bottom: 30px;
+  font-size: 14px;
+  color: #333;
+}
+
+.order-detail-wrapper .order-info-box strong {
+  display: inline-block;
+  margin-bottom: 4px;
+  color: #444;
+}
+
+.order-detail-wrapper .order-info-box .badge {
+  font-size: 13px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 500;
+  display: inline-block;
+  margin-top: 2px;
+}
+
+/* Badge màu sắc trực quan */
+.order-detail-wrapper .order-info-box .badge.bg-success {
+  background-color: transparent;
+  color: #28a745; /* xanh lá */
+}
+
+.order-detail-wrapper .order-info-box .badge.bg-danger {
+  background-color: transparent;
+  color: #dc3545; /* đỏ */
+}
+
+.order-detail-wrapper .order-info-box .badge.bg-warning {
+  background-color: transparent;
+  color: #ff6f61; /* cam */
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .order-detail-wrapper .order-info-box {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+}

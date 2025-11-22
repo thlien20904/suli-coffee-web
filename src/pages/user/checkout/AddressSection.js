@@ -4,8 +4,6 @@ import axios from "axios";
 import { buildApiUrl } from "../../../utils/apiConfig";
 
 axios.defaults.withCredentials = true;
-const token = localStorage.getItem("token");
-if (token) axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
 export default function AddressSection({
   user,
@@ -200,14 +198,21 @@ export default function AddressSection({
     setSavingAddress(true);
     setError("");
     try {
+      const token = localStorage.getItem("token");
       const res = await axios.post(
         buildApiUrl("/api/orders/addresses/save"),
-        addressToSave
+        addressToSave,
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
       );
       if (res.data.success) {
         setSaveSuccess("Đã lưu địa chỉ thành công!");
         const addrRes = await axios.get(
-          buildApiUrl(`/api/orders/addresses?userId=${user.Id}`)
+          buildApiUrl(`/api/orders/addresses?userId=${user.Id}`),
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
         );
         setUserAddresses(addrRes.data.data || []);
         setSelectedSavedAddressId(res.data.addressId);

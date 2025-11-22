@@ -1,4 +1,85 @@
 /* Profile Page CSS - Dựa trên style cung cấp, thích nghi với cấu trúc sidebar + content */
+/* ------------------------------
+   SIDEBAR MENU (Tabs)
+------------------------------ */
+
+.profile-menu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.profile-menu li {
+  margin-bottom: 12px;
+}
+
+.profile-menu a {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  width: 100%;
+  padding: 12px 16px;
+
+  background: #ffffff;
+  border: 1px solid #e6e6e6;
+  border-radius: 10px;
+
+  font-size: 15px;
+  font-weight: 500;
+  color: #333;
+  text-decoration: none;
+
+  transition: all 0.25s ease;
+  position: relative;
+
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+}
+
+.profile-menu a::before {
+  content: "";
+  width: 6px;
+  height: 0;
+  background: #ff6f61;
+  border-radius: 4px;
+  position: absolute;
+  left: -8px;
+  transition: height 0.25s ease;
+}
+
+.profile-menu a:hover {
+  background: #fff4f2;
+  border-color: #ff6f61;
+  color: #ff6f61;
+  transform: translateX(3px);
+}
+
+.profile-menu li.active a {
+  background: linear-gradient(135deg, #ff6f61, #ff8b7c);
+  border-color: transparent;
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 4px 10px rgba(255, 111, 97, 0.4);
+}
+
+.profile-menu li.active a::before {
+  height: 70%;
+}
+
+/* Icon spacing chuẩn */
+.profile-menu a span.icon {
+  font-size: 18px;
+  width: 22px;
+  text-align: center;
+}
+
+/* Mobile chỉnh lại */
+@media (max-width: 768px) {
+  .profile-menu a {
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+}
 
 /* Wrapper toàn bộ trang */
 .profile-wrapper {

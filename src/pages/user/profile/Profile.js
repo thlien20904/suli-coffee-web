@@ -1,32 +1,20 @@
 // frontend/src/pages/user/profile/Profile.js
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, Outlet, useLocation } from "react-router-dom";
 import "../../../styles/pages/profile.css";
 
 // Import helper functions
 import { getAvatarUrl, getDefaultImage } from "../../../utils/imageUtils";
 
-// Import các phần con
-import ProfileInfo from "./ProfileInfo";
-import OrdersList from "./OrdersList";
-import Vouchers from "./Vouchers";
-import Notifications from "./Notifications";
-import Help from "./Help";
+// Import các phần con (nếu cần pass props, nhưng giờ dùng Outlet nên các con tự fetch)
 import { API_BASE_URL } from "../../../utils/apiConfig";
 
 function Profile() {
-  const navigate = useNavigate();
+  const location = useLocation();
   const token = localStorage.getItem("token");
-  const [activeSection, setActiveSection] = useState("profile");
   const [userState, setUserState] = useState(null);
   const [avatar, setAvatar] = useState(getDefaultImage());
-  const [orders, setOrders] = useState([]);
-  const [pagination, setPagination] = useState({
-    currentPage: 1,
-    totalPages: 1,
-  });
   const [loading, setLoading] = useState(true);
-  const [loadingOrders, setLoadingOrders] = useState(false);
   const [error, setError] = useState("");
 
   // Helper fetch có token
@@ -42,7 +30,7 @@ function Profile() {
   // Lấy thông tin user
   useEffect(() => {
     if (!token) {
-      navigate("/login");
+      window.location.href = "/login"; // Redirect nếu không có token
       return;
     }
     const fetchUser = async () => {
@@ -50,7 +38,6 @@ function Profile() {
         setLoading(true);
         const data = await apiFetch("/api/profile");
         if (data.success && data.data) {
-          // <- sửa từ data.user -> data.data
           setUserState(data.data);
           setAvatar(getAvatarUrl(data.data.AvatarUrl));
         }
@@ -61,48 +48,16 @@ function Profile() {
       }
     };
     fetchUser();
-  }, [token, navigate]);
+  }, [token]);
 
-  // Đổi section
-  const showSection = (section) => {
-    setActiveSection(section);
-    if (section === "orders") fetchOrders("cho-xac-nhan", 1);
-  };
-
-  // Lấy đơn hàng
-  const fetchOrders = async (tab, page) => {
-    setLoadingOrders(true);
-    try {
-      const data = await apiFetch(
-        `/api/profile/orders?page=${page}&pageSize=5&tab=${tab}`
-      );
-      if (data.success) {
-        setOrders(data.orders || []);
-        setPagination({
-          currentPage: data.currentPage,
-          totalPages: data.totalPages,
-        });
-      } else setOrders([]);
-    } catch (err) {
-      setError(err.message);
-    }
-    setLoadingOrders(false);
-  };
-
-  const cancelOrder = async (orderId) => {
-    if (!window.confirm("Hủy đơn hàng này?")) return;
-    try {
-      const data = await apiFetch("/api/profile/orders/cancel", {
-        method: "POST",
-        body: JSON.stringify({ orderId }),
-      });
-      if (data.success) {
-        alert(data.message);
-        fetchOrders("cho-xac-nhan", pagination.currentPage);
-      } else alert(data.message);
-    } catch {
-      alert("Lỗi hủy đơn hàng!");
-    }
+  // Xác định active menu dựa trên location.pathname
+  const getActiveSection = () => {
+    const path = location.pathname;
+    if (path.includes("/profile/orders")) return "orders";
+    if (path.includes("/profile/vouchers")) return "vouchers";
+    if (path.includes("/profile/notifications")) return "notifications";
+    if (path.includes("/profile/help")) return "help";
+    return "profile"; // Default
   };
 
   if (loading) return <div className="text-center py-5">Đang tải...</div>;
@@ -139,50 +94,30 @@ function Profile() {
             </p>
           </div>
           <ul className="profile-menu">
-            <li>
-              <button onClick={() => showSection("orders")}>📦 Orders</button>
+            <li className={getActiveSection() === "orders" ? "active" : ""}>
+              <Link to="/profile/orders">📦 Orders</Link>
             </li>
-            <li>
-              <button onClick={() => showSection("profile")}>⚙ Profile</button>
+            <li className={getActiveSection() === "profile" ? "active" : ""}>
+              <Link to="/profile">⚙ Profile</Link>
             </li>
-            <li>
-              <button onClick={() => showSection("vouchers")}>
-                🎁 Vouchers
-              </button>
+            <li className={getActiveSection() === "vouchers" ? "active" : ""}>
+              <Link to="/profile/vouchers">🎁 Vouchers</Link>
             </li>
-            <li>
-              <button onClick={() => showSection("notifications")}>
-                🔔 Notifications
-              </button>
+            <li
+              className={getActiveSection() === "notifications" ? "active" : ""}
+            >
+              <Link to="/profile/notifications">🔔 Notifications</Link>
             </li>
-            <li>
-              <button onClick={() => showSection("help")}>❓ Help</button>
+            <li className={getActiveSection() === "help" ? "active" : ""}>
+              <Link to="/profile/help">❓ Help</Link>
             </li>
           </ul>
         </div>
 
-        {/* Nội dung chính */}
+        {/* Nội dung chính - Sử dụng Outlet để render route con */}
         <div className="profile-content">
-          {activeSection === "profile" && (
-            <ProfileInfo
-              userState={userState}
-              apiFetch={apiFetch}
-              avatar={avatar}
-              setAvatar={setAvatar}
-            />
-          )}
-          {activeSection === "orders" && (
-            <OrdersList
-              orders={orders}
-              pagination={pagination}
-              loadingOrders={loadingOrders}
-              fetchOrders={fetchOrders}
-              cancelOrder={cancelOrder}
-            />
-          )}
-          {activeSection === "vouchers" && <Vouchers />}
-          {activeSection === "notifications" && <Notifications />}
-          {activeSection === "help" && <Help />}
+          <Outlet context={{ userState, apiFetch, avatar, setAvatar }} />{" "}
+          {/* Pass context nếu cần cho con */}
         </div>
       </div>
     </div>

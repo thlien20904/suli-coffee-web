@@ -143,7 +143,10 @@ export default function VnpayReturn() {
                 </Button>
               )}
               {!isSuccess && (
-                <Button variant="warning" onClick={() => navigate("/profile")}>
+                <Button
+                  variant="warning"
+                  onClick={() => navigate("/profile/orders")}
+                >
                   Thử lại thanh toán
                 </Button>
               )}

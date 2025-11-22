@@ -114,7 +114,7 @@ export default function Successful() {
         <Alert variant="warning">
           Không tìm thấy đơn hàng. Vui lòng kiểm tra lại!
         </Alert>
-        <Button variant="primary" onClick={() => navigate("/profile")}>
+        <Button variant="primary" onClick={() => navigate("/profile/orders")}>
           Xem lịch sử đơn hàng
         </Button>
       </div>

@@ -237,12 +237,13 @@ function createCSPMiddleware(frontendBuildPath, options = {}) {
       try {
         const nonce = generateNonce();
         const csp = [
-          "default-src 'self'",
+          "default-src 'self' blob:",
           //   `script-src 'self' 'nonce-${nonce}' 'unsafe-eval'`,
           "script-src 'self' 'unsafe-inline' 'unsafe-eval'",
           "style-src 'self' https: 'unsafe-inline'",
           "img-src * data: blob:",
-          `connect-src 'self' ws://localhost:5000 https://accounts.google.com https://*.googleapis.com`,
+          "media-src 'self' https://vhkvfmbmmsolqiwrjlxp.supabase.co https://*.supabase.co blob: data:",
+          `connect-src 'self' ws://localhost:5000 ws://localhost:3000 wss://suli-coffee.onrender.com https://suli-coffee.onrender.com https://accounts.google.com https://*.googleapis.com https://vhkvfmbmmsolqiwrjlxp.supabase.co`,
           "font-src 'self' https: data:",
           "object-src 'none'",
           "frame-ancestors 'self'",

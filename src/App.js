@@ -9,6 +9,9 @@ import { jwtDecode } from "jwt-decode";
 import CSPProvider from "./components/CSP/CSPProvider";
 import CSPDashboard from "./components/CSP/CSPDashboard";
 
+// ChatBot
+import ChatBot from "./components/ChatBot";
+
 // user pages
 import Home from "./pages/user/Home";
 import Login from "./pages/user/Login";
@@ -30,6 +33,9 @@ import OrdersList from "./pages/user/profile/OrdersList";
 import Vouchers from "./pages/user/profile/Vouchers";
 import Notifications from "./pages/user/profile/Notifications";
 import Help from "./pages/user/profile/Help";
+import OrderDetail from "./pages/user/profile/OrderDetail";
+import ReturnOrder from "./pages/user/profile/ReturnOrder"; // ✅ THÊM: Trang trả hàng
+//import ReviewPopup from "./components/user/profile/ReviewPopup";
 
 import Stores from "./pages/user/StoresUser";
 import VnpayReturn from "./pages/user/VnpayReturn";
@@ -104,6 +110,7 @@ function App() {
 
   return (
     <CSPProvider>
+       <ChatBot />
       <Routes>
         {/* CSP Dashboard route */}
         <Route path="/csp-dashboard" element={<CSPDashboard />} />
@@ -150,7 +157,7 @@ function App() {
           <Route path="about" element={<About />} />
           <Route path="contact" element={<Contact />} />
 
-          {/* Profile routes */}
+          {/* Profile nested routes - Giữ nguyên cấu trúc, chỉ thêm nested cho profile */}
           <Route
             path="profile"
             element={
@@ -158,47 +165,21 @@ function App() {
                 <Profile />
               </PrivateRoute>
             }
-          />
-          <Route
-            path="profile/info"
-            element={
-              <PrivateRoute>
-                <ProfileInfo />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="profile/orders"
-            element={
-              <PrivateRoute>
-                <OrdersList />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="profile/vouchers"
-            element={
-              <PrivateRoute>
-                <Vouchers />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="profile/notifications"
-            element={
-              <PrivateRoute>
-                <Notifications />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="profile/help"
-            element={
-              <PrivateRoute>
-                <Help />
-              </PrivateRoute>
-            }
-          />
+          >
+            <Route index element={<ProfileInfo />} />{" "}
+            {/* /profile → ProfileInfo */}
+            <Route path="orders">
+              <Route index element={<OrdersList />} />
+              <Route path="orderdetail/:orderId" element={<OrderDetail />} />
+              <Route path="return-order/:orderId" element={<ReturnOrder />} /> {/* ✅ THÊM: Trang trả hàng */}
+            </Route>{" "}
+            {/* /profile/orders */}
+            <Route path="vouchers" element={<Vouchers />} />{" "}
+            {/* /profile/vouchers */}
+            <Route path="notifications" element={<Notifications />} />{" "}
+            {/* /profile/notifications */}
+            <Route path="help" element={<Help />} /> {/* /profile/help */}
+          </Route>
         </Route>
 
         {/* Admin routes */}

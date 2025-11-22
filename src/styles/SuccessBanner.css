@@ -1,0 +1,45 @@
+/* SuccessBanner.css - Thanh thông báo thành công full width */
+
+.success-banner {
+  position: fixed;
+  top: var(--header-height, 70px);
+  left: 0;
+  width: 100%;
+  background: linear-gradient(90deg, #dae4daff, #81c784);
+  color: #fff;
+  text-align: center;
+  padding: 10px 0;
+  font-weight: 600;
+  font-size: 15px;
+  z-index: 900;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  border-radius: 0 0 8px 8px;
+  animation: slideDown 0.3s ease-out;
+}
+
+.success-progress {
+  height: 4px;
+  background: linear-gradient(90deg, #ebf3ebff, #c8e6c9);
+  width: 100%;
+  transition: width 2s linear;
+  border-radius: 0 0 8px 8px;
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .success-banner {
+    font-size: 14px;
+    padding: 14px 16px;
+  }
+}

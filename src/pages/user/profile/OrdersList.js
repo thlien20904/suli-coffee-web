@@ -3,6 +3,8 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { buildApiUrl } from "../../../utils/apiConfig";
 import Swal from "sweetalert2";
+import ReviewPopup from "./ReviewPopup";           // Đánh giá / Sửa
+import ReviewDetailPopup from "./ReviewDetailPopup"; // Xem đánh giá + nút Sửa
 import "../../../styles/pages/orderslist.css";
 
 export default function OrdersList() {
@@ -19,15 +21,20 @@ export default function OrdersList() {
   const [ordersData, setOrdersData] = useState({});
   const [loadingTabs, setLoadingTabs] = useState({});
 
+  // Popup states
+  const [showReviewPopup, setShowReviewPopup] = useState(null);     // orderId
+  const [showReviewDetail, setShowReviewDetail] = useState(null);   // orderId
+
   const navigate = useNavigate();
 
-  // -------------------- LẤY ĐƠN HÀNG --------------------
+  // ==================== LẤY ĐƠN HÀNG ====================
   const fetchOrders = async (tab, page = 1) => {
-    setLoadingTabs((prev) => ({ ...prev, [tab]: true }));
+    setLoadingTabs(prev => ({ ...prev, [tab]: true }));
 
     try {
       const token = localStorage.getItem("token");
       let res;
+
       if (tab === "pending") {
         res = await axios.get(buildApiUrl("/api/orders/pending"), {
           headers: { Authorization: `Bearer ${token}` },
@@ -35,37 +42,63 @@ export default function OrdersList() {
       } else {
         res = await axios.get(buildApiUrl("/api/profile/orders"), {
           headers: { Authorization: `Bearer ${token}` },
-          params: { tab, page, pageSize: 5 },
+          params: { tab, page, pageSize: 10 },
         });
       }
 
       if (res.data.success) {
-        const d = res.data.data;
-        setOrdersData((prev) => ({
+        const orders = res.data.data.orders || [];
+
+        // Kiểm tra đã đánh giá hết chưa (dùng API checkReviewed)
+        const enrichedOrders = await Promise.all(
+          orders.map(async (order) => {
+            if (tab === "da-giao") {
+              try {
+                const checkRes = await axios.get(
+                  buildApiUrl(`/api/profile/order/${order.OrderId}/reviewed`),
+                  { headers: { Authorization: `Bearer ${token}` } }
+                );
+                order.hasReviewed = checkRes.data.data?.reviewed || false;
+              } catch {
+                order.hasReviewed = false;
+              }
+            } else {
+              order.hasReviewed = false;
+            }
+            return order;
+          })
+        );
+
+        setOrdersData(prev => ({
           ...prev,
           [tab]: {
-            orders: d.orders,
-            currentPage: d.currentPage,
-            totalPages: d.totalPages,
+            orders: enrichedOrders,
+            currentPage: res.data.data.currentPage || 1,
+            totalPages: res.data.data.totalPages || 1,
           },
         }));
       } else {
-        setOrdersData((prev) => ({
+        setOrdersData(prev => ({
           ...prev,
           [tab]: { orders: [], currentPage: 1, totalPages: 1 },
         }));
       }
     } catch (err) {
-      console.error("Fetch Orders Error:", err);
-      setOrdersData((prev) => ({ ...prev, [tab]: { orders: [] } }));
+      console.error("Fetch error:", err);
+      setOrdersData(prev => ({ ...prev, [tab]: { orders: [] } }));
     } finally {
-      setLoadingTabs((prev) => ({ ...prev, [tab]: false }));
+      setLoadingTabs(prev => ({ ...prev, [tab]: false }));
     }
   };
 
-  // -------------------- HỦY ĐƠN --------------------
-  const cancelOrder = async (orderId) => {
-    Swal.fire({
+  // ==================== XEM CHI TIẾT ====================
+  const viewOrderDetail = (orderId) => {
+    navigate(`/profile/orders/orderdetail/${orderId}`);
+  };
+
+  // ==================== HỦY ĐƠN ====================
+  const cancelOrder = async (orderId, orderType = "normal") => {
+    const result = await Swal.fire({
       title: "Xác nhận hủy đơn hàng?",
       text: "Bạn có chắc chắn muốn hủy đơn hàng này không?",
       icon: "warning",
@@ -73,92 +106,143 @@ export default function OrdersList() {
       confirmButtonText: "Có, hủy ngay!",
       cancelButtonText: "Không",
       reverseButtons: true,
-    }).then(async (result) => {
-      if (!result.isConfirmed) return;
+    });
 
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.post(
-          buildApiUrl("/api/profile/orders/cancel"),
-          { orderId },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
+    if (!result.isConfirmed) return;
 
-        if (res.data.success) {
-          Swal.fire({
-            icon: "success",
-            title: "Thành công!",
-            text: "Đơn hàng đã được hủy.",
-            showConfirmButton: true,
-            timer: 1000,
-          }).then(() => {
-            setOrdersData((prev) => {
-              const newData = { ...prev };
+    try {
+      const token = localStorage.getItem("token");
+      
+      // Chọn API tùy theo loại đơn
+      const apiUrl = orderType === "pending"
+        ? `/api/orders/pending/${orderId}/cancel`
+        : "/api/profile/orders/cancel";
+      
+      const res = await axios.post(
+        buildApiUrl(apiUrl),
+        orderType === "pending" ? {} : { orderId }, // pending không cần body
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
-              // 1️⃣ Loại bỏ khỏi pending nếu có
-              if (newData["pending"]) {
-                newData["pending"].orders = newData["pending"].orders.filter(
-                  (o) => o.OrderId !== orderId && o.StatusId !== 5
-                );
-              }
+      if (res.data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Thành công!",
+          text: "Đơn hàng đã được hủy.",
+          showConfirmButton: true,
+          timer: 1000,
+        }).then(() => {
+          setOrdersData(prev => {
+            const newData = { ...prev };
 
-              // 2️⃣ Thêm vào da-huy
-              if (!newData["da-huy"]) {
-                newData["da-huy"] = {
-                  orders: [],
-                  currentPage: 1,
-                  totalPages: 1,
-                };
-              }
+            // 1️⃣ Loại bỏ khỏi pending nếu có
+            if (newData["pending"]) {
+              newData["pending"].orders = newData["pending"].orders.filter(
+                (o) => o.OrderId !== orderId && o.StatusId !== 5
+              );
+            }
 
-              const cancelledOrder = res.data.order;
-              if (cancelledOrder) {
-                newData["da-huy"].orders.unshift(cancelledOrder);
-              } else {
-                // Nếu backend không trả đơn, fetch lại tab da-huy
-                fetchOrders("da-huy", ordersData["da-huy"]?.currentPage || 1);
-              }
+            // 2️⃣ Thêm vào da-huy
+            if (!newData["da-huy"]) {
+              newData["da-huy"] = {
+                orders: [],
+                currentPage: 1,
+                totalPages: 1,
+              };
+            }
 
-              return newData;
-            });
+            const cancelledOrder = res.data.order;
+            if (cancelledOrder) {
+              newData["da-huy"].orders.unshift(cancelledOrder);
+            } else {
+              // Nếu backend không trả đơn, fetch lại tab da-huy
+              fetchOrders("da-huy", ordersData["da-huy"]?.currentPage || 1);
+            }
+
+            return newData;
           });
-        } else {
-          Swal.fire({
-            icon: "error",
-            title: "Lỗi!",
-            text: res.data.message || "Hủy thất bại",
-            showConfirmButton: true,
-          });
-        }
-      } catch (err) {
-        console.error("CANCEL ORDER ERROR:", err);
+        });
+      } else {
         Swal.fire({
           icon: "error",
           title: "Lỗi!",
-          text: "Không thể kết nối server!",
+          text: res.data.message || "Hủy thất bại",
           showConfirmButton: true,
         });
       }
-    });
+    } catch (err) {
+      console.error("CANCEL ORDER ERROR:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi!",
+        text: "Không thể kết nối server!",
+        showConfirmButton: true,
+      });
+    }
   };
 
-  // -------------------- XỬ LÝ CHUYỂN TAB --------------------
+  // ==================== ĐÃ NHẬN HÀNG – REALTIME ====================
+  const confirmReceived = async (orderId) => {
+    const result = await Swal.fire({
+      title: "Đã nhận được hàng?",
+      text: "Đơn sẽ chuyển sang tab Đã giao ngay!",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonText: "Đã nhận",
+      cancelButtonText: "Chưa nhận",
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      await axios.post(
+        buildApiUrl("/api/profile/orders/confirm-received"),
+        { orderId },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      setOrdersData(prev => {
+        const newData = { ...prev };
+        let movedOrder = null;
+
+        if (newData["dang-giao-hang"]?.orders) {
+          const idx = newData["dang-giao-hang"].orders.findIndex(o => o.OrderId === orderId);
+          if (idx !== - 1) {
+            movedOrder = { ...newData["dang-giao-hang"].orders[idx], StatusId: 4, Status: "Giao hàng thành công" };
+            newData["dang-giao-hang"].orders.splice(idx, 1);
+          }
+        }
+
+        if (!newData["da-giao"]) newData["da-giao"] = { orders: [], currentPage: 1, totalPages: 1 };
+        if (movedOrder) newData["da-giao"].orders.unshift(movedOrder);
+
+        return newData;
+      });
+
+      if (activeTab === "dang-giao-hang") setActiveTab("da-giao");
+      Swal.fire("Thành công!", "Đơn đã chuyển sang Đã giao", "success");
+    } catch (err) {
+      Swal.fire("Lỗi", "Không thể xác nhận", "error");
+    }
+  };
+
+  // ==================== CHUYỂN TAB ====================
   const handleTabChange = (tabId) => {
     setActiveTab(tabId);
-    fetchOrders(tabId, 1);
+    if (!ordersData[tabId]?.orders?.length) fetchOrders(tabId, 1);
   };
 
-  // -------------------- EFFECT --------------------
   useEffect(() => {
     fetchOrders(activeTab, 1);
   }, []);
 
-  // -------------------- RENDER BẢNG --------------------
+  // ==================== RENDER TABLE ====================
   const renderTable = (tab) => {
     const data = ordersData[tab];
     const isLoading = loadingTabs[tab];
 
-    if (isLoading) return <p className="text-center">Đang tải đơn hàng...</p>;
+    if (isLoading) return <p className="text-center">Đang tải...</p>;
     if (!data || !data.orders) {
       return (
         <p className="text-center">Bạn chưa có đơn hàng ở trạng thái này.</p>
@@ -205,13 +289,13 @@ export default function OrdersList() {
           </thead>
           <tbody>
             {filteredOrders.map((o) => (
-              <tr key={o.OrderId}>
+              <tr
+                key={o.OrderId}
+                onClick={() => viewOrderDetail(o.OrderId)}
+                style={{ cursor: "pointer" }}
+              >
                 <td>#{o.OrderId}</td>
-                <td>
-                  {new Date(o.OrderDate).toLocaleString("vi-VN", {
-                    hour12: true,
-                  })}
-                </td>
+                <td>{new Date(o.OrderDate).toLocaleString("vi-VN")}</td>
                 <td>{o.TotalAmount.toLocaleString("vi-VN")} ₫</td>
                 <td>{o.PaymentMethod || "N/A"}</td>
                 <td>{o.Status}</td>
@@ -232,28 +316,54 @@ export default function OrdersList() {
                   </span>
                 </td>
                 <td>
-                  {o.OrderDetails.map((d, idx) => (
-                    <div key={idx} className="order-detail-line">
-                      <span className="fw-bold">{d.FoodName}</span>
+                  {o.OrderDetails.map((d, i) => (
+                    <div key={i} className="small">
+                      <strong>{d.FoodName}</strong> × {d.Quantity}
                       {d.SizeName && ` (${d.SizeName})`}
-                      <span>
-                        {" | "}SL: {d.Quantity} -{" "}
-                        {d.Price.toLocaleString("vi-VN")} ₫
-                      </span>
-                      {d.Toppings && d.Toppings.length > 0 && (
-                        <div
-                          className="text-muted"
-                          style={{ fontSize: "0.9em" }}
-                        >
-                          {d.Toppings.map((t) => t.ToppingName).join(" + ")}
+                      {d.Toppings?.length > 0 && (
+                        <div className="text-muted">
+                          + {d.Toppings.map((t) => t.ToppingName).join(" + ")}
                         </div>
                       )}
                     </div>
                   ))}
                 </td>
-                {/* ✅ Bọc button trong <td> */}
-                <td>
-                  {activeTab === "pending" && (
+                <td onClick={(e) => e.stopPropagation()}>
+                  {/* ĐANG GIAO - CHỈ CÓ "ĐÃ NHẬN HÀNG" */}
+                  {tab === "dang-giao-hang" && (
+                    <div className="d-flex flex-column gap-2">
+                      <button
+                        className="btn btn-success btn-sm"
+                        onClick={() => confirmReceived(o.OrderId)}
+                      >
+                        Đã nhận hàng
+                      </button>
+                    </div>
+                  )}
+
+                  {/* ĐÃ GIAO – CHỈ NÚT ĐÁNH GIÁ / XEM ĐÁNH GIÁ */}
+                  {tab === "da-giao" && (
+                    <div className="d-flex flex-column gap-2">
+                      {!o.hasReviewed ? (
+                        <button
+                          className="btn btn-primary btn-sm"
+                          onClick={() => setShowReviewPopup(o.OrderId)}
+                        >
+                          Đánh giá
+                        </button>
+                      ) : (
+                        <button
+                          className="btn btn-success btn-sm"
+                          onClick={() => setShowReviewDetail(o.OrderId)}
+                        >
+                          Xem đánh giá
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {/* PENDING */}
+                  {tab === "pending" && (
                     <>
                       <button
                         className="btn btn-success btn-sm me-1"
@@ -273,13 +383,14 @@ export default function OrdersList() {
                       </button>
                     </>
                   )}
-                  {(activeTab === "cho-xac-nhan" ||
-                    activeTab === "dang-chuan-bi") && (
+
+                  {/* CHỜ XÁC NHẬN & ĐANG CHUẨN BỊ */}
+                  {(tab === "cho-xac-nhan" || tab === "dang-chuan-bi") && (
                     <button
                       className="btn btn-warning btn-sm text-white"
                       onClick={() => cancelOrder(o.OrderId)}
                     >
-                      Hủy
+                      Hủy đơn
                     </button>
                   )}
                 </td>
@@ -288,34 +399,31 @@ export default function OrdersList() {
           </tbody>
         </table>
 
+        {/* Pagination */}
         {data.totalPages > 1 && tab !== "pending" && (
-          <nav className="pagination justify-content-center">
+          <div className="pagination justify-content-center mt-4">
             <button
-              className="page-link"
               disabled={data.currentPage === 1}
               onClick={() => fetchOrders(tab, data.currentPage - 1)}
             >
-              &laquo;
+              Trước
             </button>
             {[...Array(data.totalPages)].map((_, i) => (
               <button
                 key={i}
-                className={`page-link ${
-                  data.currentPage === i + 1 ? "active" : ""
-                }`}
+                className={data.currentPage === i + 1 ? "active" : ""}
                 onClick={() => fetchOrders(tab, i + 1)}
               >
                 {i + 1}
               </button>
             ))}
             <button
-              className="page-link"
               disabled={data.currentPage === data.totalPages}
               onClick={() => fetchOrders(tab, data.currentPage + 1)}
             >
-              &raquo;
+              Sau
             </button>
-          </nav>
+          </div>
         )}
       </>
     );
@@ -323,8 +431,9 @@ export default function OrdersList() {
 
   return (
     <div className="p-4">
-      <h4 className="mb-3 fw-bold">Đơn hàng của bạn</h4>
-      <ul className="nav nav-tabs mb-3">
+      <h4 className="mb-4 fw-bold">Đơn hàng của bạn</h4>
+
+      <ul className="nav nav-tabs mb-4">
         {tabs.map((t) => (
           <li className="nav-item" key={t.id}>
             <button
@@ -336,7 +445,30 @@ export default function OrdersList() {
           </li>
         ))}
       </ul>
-      <div>{renderTable(activeTab)}</div>
+
+      {renderTable(activeTab)}
+
+      {/* POPUP ĐÁNH GIÁ */}
+      {showReviewPopup && (
+        <ReviewPopup
+          orderId={showReviewPopup}
+          onClose={() => {
+            setShowReviewPopup(null);
+            fetchOrders("da-giao"); // Refresh lại để cập nhật hasReviewed
+          }}
+        />
+      )}
+
+      {/* POPUP XEM + SỬA ĐÁNH GIÁ */}
+      {showReviewDetail && (
+        <ReviewDetailPopup
+          orderId={showReviewDetail}
+          onClose={() => {
+            setShowReviewDetail(null);
+            fetchOrders("da-giao");
+          }}
+        />
+      )}
     </div>
   );
 }

@@ -1,0 +1,468 @@
+/* ==========================
+   ReviewPopup.css - Compact & Clean UI
+========================== */
+
+.review-popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.review-popup {
+  background: #ffffff;
+  border-radius: 16px;
+  width: 80%;
+  max-width: 800px; /* Giảm width để ngắn gọn */
+  max-height: 70vh; /* Giảm height để không đè head */
+  overflow-y: auto;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+}
+/* Ẩn thanh cuộn nhưng vẫn scroll được */
+.review-popup {
+  overflow-y: auto; /* vẫn cho lướt */
+}
+
+.review-popup::-webkit-scrollbar {
+  width: 0px; /* ẩn thanh scroll */
+  background: transparent; /* nền trong suốt */
+}
+
+/* Firefox */
+.review-popup {
+  scrollbar-width: thin; /* "auto" | "thin" */
+  scrollbar-color: transparent transparent; /* thumb, track */
+}
+
+/* HEADER */
+.review-header {
+  padding: 16px 20px; /* Giảm padding */
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.review-header h4 {
+  margin: 0;
+  font-size: 1.4rem; /* Giảm font */
+  font-weight: 600;
+  color: #333;
+}
+
+.close-btn {
+  font-size: 24px; /* Giảm size */
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #999;
+}
+
+/* SHOP INFO - Spacing đều, line-height khớp */
+.shop-info-banner {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px; /* Giảm padding */
+  background: linear-gradient(90deg, #ffe6cc, #fff8f0);
+  border-radius: 12px;
+  align-items: flex-start; /* Align top để ngắn */
+  margin: 12px 16px; /* Margin đều */
+}
+
+.shop-icon {
+  font-size: 24px; /* Giảm icon */
+  color: #ee4d2d;
+  margin-top: 4px; /* Align với text */
+}
+
+.shop-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px; /* Giảm font */
+  color: #444;
+  line-height: 1.3; /* Khớp spacing */
+}
+
+.shop-details strong {
+  font-size: 14px; /* Giảm */
+  color: #ee4d2d;
+  font-weight: 600;
+}
+
+.shop-details div {
+  font-size: 12px;
+  color: #555;
+}
+
+/* PROMO BANNER - Spacing khớp shop info */
+.review-banner {
+  background: linear-gradient(90deg, #fff0e5, #fff8f0);
+  padding: 12px 16px; /* Giảm padding */
+  text-align: center;
+  font-size: 13px; /* Giảm font */
+  color: #ee4d2d;
+  font-weight: 500;
+  border-radius: 12px;
+  margin: 8px 16px 12px; /* Gap nhỏ với shop */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px; /* Giảm gap */
+  line-height: 1.3; /* Khớp shop */
+}
+
+.banner-star {
+  color: #ffb400;
+  font-size: 16px; /* Giảm */
+}
+
+/* REVIEW ITEMS - Compact */
+.review-items {
+  padding: 0 16px 12px; /* Giảm padding */
+  flex: 1; /* Grow to fill space */
+}
+
+.review-item-card {
+  background: #ffffff;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  margin-bottom: 12px; /* Giảm margin */
+}
+
+/* PRODUCT INFO - Ensure size/toppings show, no override */
+.item-info {
+  display: flex;
+  gap: 12px;
+  padding: 12px 16px; /* Giảm */
+  background: #fafafa;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.item-info img {
+  width: 60px; /* Giảm size ảnh */
+  height: 60px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.item-info > div {
+  /* Direct child div for details */
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* Giảm gap */
+  flex: 1; /* Take space */
+}
+
+.size,
+.toppings {
+  font-size: 11px; /* Nhỏ để không đè */
+  color: #666;
+  background: #f0f8ff; /* Nền nhẹ */
+  padding: 2px 6px;
+  border-radius: 4px;
+  display: inline-block; /* Inline để không break line */
+  margin-top: 2px;
+  white-space: nowrap; /* Không wrap */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%; /* Prevent overflow */
+}
+
+.toppings {
+  background: #fff4e5;
+  color: #ee4d2d;
+}
+
+/* REVIEW SECTION - Compact */
+.review-section {
+  padding: 12px 16px; /* Giảm */
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Giảm gap */
+}
+
+.stars {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Giảm */
+  font-size: 18px; /* Giảm stars */
+  cursor: pointer;
+}
+
+.star-icon {
+  color: #ccc;
+}
+
+.star-icon.active {
+  color: #ffb400;
+}
+
+.rating-text {
+  margin-left: 8px; /* Giảm */
+  color: #ffb400;
+  font-weight: 500;
+  font-size: 12px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 60px; /* Giảm height */
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 8px; /* Giảm */
+  font-size: 13px; /* Giảm */
+  resize: none;
+  color: #333;
+}
+
+textarea:focus {
+  border-color: #ee4d2d;
+  outline: none;
+}
+
+/* UPLOAD AREA - Compact */
+.upload-area {
+  display: flex;
+  gap: 8px; /* Giảm */
+  margin-top: 6px; /* Giảm */
+}
+
+.upload-btn {
+  display: flex;
+  align-items: center;
+  gap: 4px; /* Giảm */
+  padding: 6px 10px; /* Giảm */
+  border-radius: 6px;
+  border: 1px dashed #ccc;
+  cursor: pointer;
+  font-size: 12px; /* Giảm */
+  background: #fafafa;
+  flex: 1; /* Even space */
+}
+
+.upload-btn input {
+  display: none;
+}
+
+.upload-btn.photo {
+  color: #ee4d2d;
+}
+
+.upload-btn.video {
+  color: #1e90ff;
+  border-color: #a0d1ff;
+  background: #f0f8ff;
+}
+
+.media-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px; /* Giảm */
+  margin-top: 6px;
+}
+
+.media-thumb {
+  position: relative;
+  width: 64px; /* Giảm */
+  height: 64px;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid #eee;
+}
+
+.media-thumb img,
+.media-thumb video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.media-thumb button {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 16px; /* Giảm */
+  height: 16px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  border: none;
+  border-radius: 50%;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+/* TIP - Compact */
+.tip {
+  color: #ee4d2d;
+  font-size: 11px; /* Giảm */
+  margin-top: 4px;
+}
+
+/* SERVICE RATINGS - Không sát viền, spacing đẹp */
+.review-services {
+  padding: 12px 16px; /* Padding đều */
+  display: flex;
+  flex-direction: column;
+  gap: 12px; /* Gap giữa 2 service */
+  border-top: 1px solid #f0f0f0;
+  background: #fafafa;
+}
+
+.service-section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px; /* Giảm gap nội bộ */
+}
+
+.service-section .label {
+  font-size: 13px;
+  color: #444;
+  font-weight: 500;
+}
+
+.service-section .stars {
+  gap: 4px; /* Giảm gap stars */
+  font-size: 16px; /* Giảm */
+}
+
+.service-section .rating-text {
+  margin-left: 8px;
+  font-size: 11px; /* Giảm */
+}
+
+/* FOOTER - Compact */
+.review-footer {
+  padding: 12px 16px; /* Giảm */
+  background: #fafafa;
+  border-top: 1px solid #eee;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Giảm */
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-back,
+.btn-submit {
+  padding: 10px 24px; /* Giảm padding */
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  transition: background 0.25s;
+}
+
+.btn-back {
+  background: #f4f4f4;
+  color: #666;
+}
+
+.btn-back:hover {
+  background: #e0e0e0;
+}
+
+.btn-submit {
+  background: #ee4d2d;
+  color: #fff;
+}
+
+.btn-submit:hover:not(:disabled) {
+  background: #ff5c3a;
+}
+
+.btn-submit:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* RESPONSIVE - Giảm height mobile */
+@media (max-width: 768px) {
+  .review-popup {
+    width: 95%;
+    max-height: 85vh; /* Tăng nhẹ mobile */
+  }
+
+  .review-items {
+    padding: 0 12px 8px;
+  }
+
+  .review-item-card {
+    margin-bottom: 8px;
+  }
+
+  .item-info {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .item-info img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .review-section {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .upload-area {
+    gap: 6px;
+  }
+
+  .upload-btn {
+    padding: 5px 8px;
+    font-size: 11px;
+  }
+
+  .media-thumb {
+    width: 56px;
+    height: 56px;
+  }
+
+  .review-services {
+    padding: 10px 12px;
+    gap: 10px;
+  }
+
+  .service-section .stars {
+    font-size: 14px;
+  }
+
+  .actions {
+    gap: 8px;
+  }
+
+  .btn-back,
+  .btn-submit {
+    padding: 8px 20px;
+    font-size: 13px;
+  }
+}
+
+/* Animation ngắn */
+@keyframes popupFade {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}

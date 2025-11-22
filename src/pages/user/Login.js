@@ -26,18 +26,39 @@ function Login() {
   const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const [remember, setRemember] = useState(false);
-  const [errors, setErrors] = useState({ identifier: "", password: "" });
+  const [errors, setErrors] = useState({ identifier: "", password: "", captcha: "" });
   const [touched, setTouched] = useState({
     identifier: false,
     password: false,
+    captcha: false,
   });
   const [serverError, setServerErr] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  
+  // CAPTCHA state
+  const [captchaText, setCaptchaText] = useState("");
+  const [captchaInput, setCaptchaInput] = useState("");
+  
+  // Generate CAPTCHA
+  const generateCaptcha = () => {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+    let captcha = '';
+    for (let i = 0; i < 6; i++) {
+      captcha += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    setCaptchaText(captcha);
+    setCaptchaInput("");
+  };
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const location = useLocation();
+
+  // Generate CAPTCHA on mount
+  useEffect(() => {
+    generateCaptcha();
+  }, []);
 
   useEffect(() => {
     const rememberedIdentifier = localStorage.getItem(
@@ -113,22 +134,32 @@ function Login() {
     if (name === "identifier" && !value.trim())
       msg = "Vui lòng nhập Username hoặc Email.";
     if (name === "password" && !value) msg = "Vui lòng nhập Mật khẩu.";
+    if (name === "captcha") {
+      if (!value || !value.trim()) msg = "Vui lòng nhập mã bảo vệ.";
+      else if (value !== captchaText) msg = "Mã bảo vệ không đúng!";
+    }
     return msg;
   };
 
   const validateAll = () => ({
     identifier: validateField("identifier", identifier),
     password: validateField("password", password),
+    captcha: validateField("captcha", captchaInput),
   });
 
   const handleLogin = async (e) => {
     e.preventDefault();
     setServerErr("");
-    setTouched({ identifier: true, password: true });
+    setTouched({ identifier: true, password: true, captcha: true });
 
     const newErrors = validateAll();
     setErrors(newErrors);
-    if (newErrors.identifier || newErrors.password) return;
+    if (newErrors.identifier || newErrors.password || newErrors.captcha) {
+      if (newErrors.captcha) {
+        generateCaptcha(); // Regenerate CAPTCHA nếu sai
+      }
+      return;
+    }
 
     setLoading(true);
     try {
@@ -161,13 +192,32 @@ function Login() {
       navigate(role === "admin" ? "/admin/dashboard" : "/", { replace: true });
     } catch (err) {
       console.error("Login error:", err.response?.data);
-      const list = err.response?.data?.errors;
-      if (Array.isArray(list)) {
-        const mapped = { identifier: "", password: "" };
-        list.forEach((x) => (mapped[x.field] = x.msg));
-        setErrors((prev) => ({ ...prev, ...mapped }));
+      
+      // Xử lý lỗi từ backend
+      const errorData = err.response?.data;
+      const errorType = errorData?.errorType;
+      const errorMessage = errorData?.message || "Đăng nhập thất bại";
+      
+      // Hiển thị lỗi cụ thể cho field tương ứng
+      if (errorType === "username") {
+        setErrors(prev => ({ ...prev, identifier: errorMessage }));
+        setTouched(prev => ({ ...prev, identifier: true }));
+      } else if (errorType === "password") {
+        setErrors(prev => ({ ...prev, password: errorMessage }));
+        setTouched(prev => ({ ...prev, password: true }));
+      } else {
+        // Lỗi chung
+        const list = errorData?.errors;
+        if (Array.isArray(list)) {
+          const mapped = { identifier: "", password: "", captcha: "" };
+          list.forEach((x) => (mapped[x.field] = x.msg));
+          setErrors((prev) => ({ ...prev, ...mapped }));
+        }
+        setServerErr(errorMessage);
       }
-      setServerErr(err.response?.data?.message || "Đăng nhập thất bại");
+      
+      // Regenerate CAPTCHA sau khi login fail
+      generateCaptcha();
     } finally {
       setLoading(false);
     }
@@ -265,6 +315,71 @@ function Login() {
             </span>
             {touched.password && errors.password && (
               <div className="invalid-feedback">{errors.password}</div>
+            )}
+          </div>
+
+          {/* CAPTCHA */}
+          <div className="captcha-group" style={{ marginBottom: '20px' }}>
+            <label style={{ display: 'block', marginBottom: '8px', fontWeight: '500', color: '#333' }}>
+              Mã bảo vệ:
+            </label>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{
+                background: 'white',
+                border: '2px solid #333',
+                padding: '8px 16px',
+                borderRadius: '6px',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                letterSpacing: '6px',
+                color: '#333',
+                userSelect: 'none',
+                fontFamily: 'Courier New, monospace',
+                fontStyle: 'italic',
+                textDecoration: 'line-through',
+                textDecorationColor: '#999',
+                textDecorationStyle: 'wavy',
+                minWidth: '120px',
+                textAlign: 'center',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                flex: '0 0 auto'
+              }}>
+                {captchaText}
+              </div>
+              <Form.Control
+                className={`form-control ${
+                  touched.captcha && errors.captcha ? "is-invalid" : ""
+                }`}
+                type="text"
+                placeholder="Nhập mã bảo vệ"
+                value={captchaInput}
+                onChange={(e) => setCaptchaInput(e.target.value)}
+                onBlur={() => setTouched((t) => ({ ...t, captcha: true }))}
+                style={{ 
+                  padding: '10px 12px',
+                  fontSize: '15px',
+                  borderRadius: '6px',
+                  border: '1px solid #ddd',
+                  flex: '1'
+                }}
+              />
+              <Button 
+                variant="outline-dark" 
+                size="sm"
+                onClick={generateCaptcha}
+                title="Làm mới mã"
+                style={{ 
+                  fontSize: '18px',
+                  padding: '8px 12px',
+                  borderRadius: '6px',
+                  flex: '0 0 auto'
+                }}
+              >
+                ↻
+              </Button>
+            </div>
+            {touched.captcha && errors.captcha && (
+              <div className="invalid-feedback" style={{ display: 'block', marginTop: '5px' }}>{errors.captcha}</div>
             )}
           </div>
 

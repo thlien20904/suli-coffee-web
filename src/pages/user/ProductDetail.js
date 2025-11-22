@@ -10,6 +10,7 @@ import {
   API_ENDPOINTS,
   buildApiUrl,
 } from "../../utils/apiConfig";
+import { useSuccessBanner } from "../../components/SuccessBanner";
 import "../../styles/pages/ProductDetail.css";
 
 const PLACEHOLDER = "/placeholder.jpg";
@@ -27,6 +28,7 @@ export default function ProductDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { showBanner, BannerContainer } = useSuccessBanner();
 
   const [loading, setLoading] = useState(false);
   const [product, setProduct] = useState(null);
@@ -84,8 +86,8 @@ export default function ProductDetail() {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Bạn chưa đăng nhập!");
-      navigate("/login");
+      showBanner("Bạn chưa đăng nhập! Đang chuyển đến trang đăng nhập...", 2000);
+      setTimeout(() => navigate("/login"), 2000);
       return;
     }
 
@@ -98,7 +100,6 @@ export default function ProductDetail() {
 
     try {
       const res = await axios.post(buildApiUrl("/api/cart/add"), payload, {
-        // Gửi token qua header Authorization
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -107,7 +108,6 @@ export default function ProductDetail() {
       if (res.data.success) {
         // Cập nhật số lượng giỏ hàng
         const cartRes = await axios.get(buildApiUrl("/api/cart"), {
-          // Gửi token qua header Authorization
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -120,7 +120,7 @@ export default function ProductDetail() {
           dispatch(setCartCount(total));
         }
 
-        alert("Đã thêm vào giỏ hàng!");
+        showBanner("✓ Đã thêm vào giỏ hàng thành công!");
       }
     } catch (err) {
       console.error("ADD TO CART ERROR:", err.response?.data || err);
@@ -130,8 +130,8 @@ export default function ProductDetail() {
         err.message ||
         "Có lỗi xảy ra, vui lòng thử lại.";
       if (err.response?.status === 401) {
-        alert(msg + " (Bạn sẽ được chuyển tới trang đăng nhập)");
-        navigate("/login");
+        showBanner(msg + " - Đang chuyển đến trang đăng nhập...", 2500);
+        setTimeout(() => navigate("/login"), 2500);
       } else {
         alert(msg);
       }
@@ -150,8 +150,8 @@ export default function ProductDetail() {
 
     const token = localStorage.getItem("token");
     if (!token) {
-      alert("Bạn chưa đăng nhập!");
-      navigate("/login");
+      showBanner("Bạn chưa đăng nhập! Đang chuyển đến trang đăng nhập...", 2000);
+      setTimeout(() => navigate("/login"), 2000);
       return;
     }
 
@@ -208,6 +208,8 @@ export default function ProductDetail() {
   const discountedPrice = product.DiscountPrice ?? product.Price;
 
   return (
+    <>
+      <BannerContainer />
     <div className="container py-4 product-detail-page">
       {/* SỬA CHỮA CHÍNH: Thêm align-items-start vào Row để các cột căn trên */}
       <Row className="g-4 align-items-start">
@@ -325,5 +327,6 @@ export default function ProductDetail() {
         </div>
       </div>
     </div>
+    </>
   );
 }

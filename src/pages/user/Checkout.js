@@ -40,6 +40,18 @@ export default function Checkout() {
   const isSubmitted = useRef(false);
   const [successMessage, setSuccessMessage] = useState("");
   const [progress, setProgress] = useState(100);
+  const hasNavigatedRef = useRef(false); // Track nếu đã navigate away
+  const itemsStateRef = useRef(itemsState); // Ref để lưu itemsState mới nhất
+  const userRef = useRef(user); // Ref để lưu user mới nhất
+
+  // Cập nhật refs khi state thay đổi
+  useEffect(() => {
+    itemsStateRef.current = itemsState;
+  }, [itemsState]);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
   // API wrapper
   const apiFetch = useCallback(
@@ -245,6 +257,70 @@ export default function Checkout() {
 
     fetchOrderForCheckout();
   }, [apiFetch, location.state, initialItems.length]);
+
+  // ✅ Lưu đơn tạm khi rời trang (chỉ gọi 1 lần duy nhất khi unmount)
+  useEffect(() => {
+    const savePendingOnUnmount = async () => {
+      const currentItems = itemsStateRef.current;
+      const currentUser = userRef.current;
+      const isPending = location.state?.orderId;
+      
+      // Chỉ lưu nếu:
+      // 1. Có items
+      // 2. Chưa submit thanh toán thành công
+      // 3. Không phải đơn pending đang tiếp tục
+      if (
+        currentItems.length > 0 &&
+        !isSubmitted.current &&
+        !isPending &&
+        !hasNavigatedRef.current
+      ) {
+        hasNavigatedRef.current = true; // Đánh dấu đã lưu
+        
+        try {
+          console.log("💾 Saving pending order on page leave...");
+          
+          const orderItems = currentItems.map((item) => ({
+            FoodId: item.FoodId,
+            SizeID: item.Size?.SizeId || null,
+            ToppingIDs: (item.Toppings || []).map((t) => t.ToppingID),
+            Quantity: item.SoLuong || 1,
+            TotalPrice:
+              (item.DiscountPrice || item.Price || 0) * (item.SoLuong || 1),
+          }));
+
+          const fullAddr = currentUser.address || "Chưa nhập địa chỉ";
+          const token = localStorage.getItem("token");
+
+          const response = await fetch(buildApiUrl("/api/orders/save-pending"), {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+            body: JSON.stringify({
+              orderItems,
+              newAddress: fullAddr,
+            }),
+          });
+
+          const data = await response.json();
+          if (data.success) {
+            console.log("✅ Pending order saved successfully, ID:", data.orderId);
+          } else {
+            console.error("❌ Save pending failed:", data.message);
+          }
+        } catch (err) {
+          console.error("❌ Save pending order error:", err);
+        }
+      }
+    };
+
+    // Cleanup: Gọi khi component unmount (rời trang)
+    return () => {
+      savePendingOnUnmount();
+    };
+  }, [location.state]); // Chỉ phụ thuộc vào location.state
 
   // Calculate price (sync cho UI)
   const calculateItemPrice = useCallback((item) => {

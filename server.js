@@ -74,11 +74,12 @@ if (fs.existsSync(buildPath)) {
         if (path.endsWith(".html")) {
           const nonce = require("crypto").randomBytes(16).toString("base64");
           const csp = [
-            "default-src 'self'",
+            "default-src 'self' blob:",
             `script-src 'self' 'nonce-${nonce}' 'unsafe-eval' https://accounts.google.com https://*.googleapis.com https://cdnjs.cloudflare.com`,
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
             "img-src * data: blob:",
-            "connect-src 'self' https://accounts.google.com https://*.googleapis.com",
+            "media-src 'self' https://vhkvfmbmmsolqiwrjlxp.supabase.co https://*.supabase.co blob: data:",
+            "connect-src 'self' https://accounts.google.com https://*.googleapis.com http://localhost:5000 ws://localhost:5000 ws://localhost:3000 https://vhkvfmbmmsolqiwrjlxp.supabase.co",
             "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
             "object-src 'none'",
             "frame-ancestors 'self'",
@@ -104,11 +105,12 @@ if (fs.existsSync(buildPath)) {
   app.get("*", (req, res) => {
     const nonce = require("crypto").randomBytes(16).toString("base64");
     const csp = [
-      "default-src 'self'",
+      "default-src 'self' blob:",
       `script-src 'self' 'nonce-${nonce}' 'unsafe-eval' https://accounts.google.com https://*.googleapis.com https://cdnjs.cloudflare.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com",
       "img-src * data: blob:",
-      "connect-src 'self' https://accounts.google.com https://*.googleapis.com",
+      "media-src 'self' https://vhkvfmbmmsolqiwrjlxp.supabase.co https://*.supabase.co blob: data:",
+      "connect-src 'self' https://accounts.google.com https://*.googleapis.com http://localhost:5000 ws://localhost:5000 ws://localhost:3000 https://vhkvfmbmmsolqiwrjlxp.supabase.co",
       "font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com",
       "object-src 'none'",
       "frame-ancestors 'self'",
