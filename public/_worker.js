@@ -1,4 +1,4 @@
-// public/_worker.js – VERSION CUỐI CÙNG: FIX STYLE BLOCK + FULL CSP NÂNG CAO (HASH/NONCE SCRIPT, UNSAFE-INLINE STYLE)
+// public/_worker.js – FINAL CLEAN: META NONCE/POLICY CHO HASH&NONCE TAB, NO CONSOLE TESTS
 export default {
   async fetch(request, env, ctx) {
     try {
@@ -70,39 +70,6 @@ export default {
       );
       await Promise.all(stylePromises);
 
-      // Chèn script debug nonce + bắt sự kiện CSP vào <head>
-      const debugScript = `
-        <script nonce="${nonce}">
-          window.__CSP_NONCE__ = "${nonce}";
-          window.addEventListener("securitypolicyviolation", function(e) {
-            const logs = JSON.parse(localStorage.getItem("cspLogs") || "[]");
-            logs.push({
-              time: new Date().toISOString(),
-              documentURI: e.documentURI,
-              violatedDirective: e.violatedDirective,
-              blockedURI: e.blockedURI,
-              sourceFile: e.sourceFile,
-              lineNumber: e.lineNumber,
-              columnNumber: e.columnNumber,
-              disposition: e.disposition
-            });
-            localStorage.setItem("cspLogs", JSON.stringify(logs));
-          });
-          console.log("%c CSP God Mode ACTIVE ", "background:#00aa00;color:white;font-size:14px;padding:4px 8px;border-radius:4px;", 
-            "\nCurrent nonce:", "${nonce}".substring(0,16) + "...", 
-            "\nTime:", new Date().toLocaleTimeString("vi-VN"),
-            "\nPage:", location.pathname
-          );
-          console.log("%c Test hợp lệ (có nonce):", "color:green;font-weight:bold;", 
-            "const s = document.createElement('script'); s.nonce = window.__CSP_NONCE__; s.textContent = 'alert(\'Allowed!\')'; document.head.appendChild(s);"
-          );
-          console.log("%c Test bị chặn (không nonce):", "color:red;font-weight:bold;", 
-            "const s = document.createElement('script'); s.textContent = 'alert(\'Blocked!\')'; document.head.appendChild(s);"
-          );
-        </script>
-      `;
-      html = html.replace("</head>", debugScript + "</head>");
-
       // CSP POLICY: SCRIPT CHẶT (NONCE + HASH), STYLE LỎNG (UNSAFE-INLINE + HASH)
       const csp = [
         "default-src 'self' blob: data:",
@@ -110,7 +77,7 @@ export default {
         `style-src 'self' 'unsafe-inline' ${[...styleHashes].join(" ")}`, // BỎ NONCE, GIỮ UNSAFE-INLINE CHO DYNAMIC STYLES (REACT/SWEETALERT)
         "img-src * data: blob: https:",
         "font-src * data:",
-        "connect-src *", // API/RENDER/SOCKET.IO
+        "connect-src *", // API/RENDER/SOCKET.IO (KHÔNG DÙNG TRONG TEST VERCEL)
         "media-src * blob:",
         "object-src 'none'",
         "base-uri 'self'",
@@ -119,6 +86,13 @@ export default {
         "upgrade-insecure-requests",
         "block-all-mixed-content",
       ].join("; ");
+
+      // INJECT META TAGS CHO HASH&NONCE TAB + SET WINDOW NONCE (KHÔNG TEST/LOG)
+      const metaTags = `
+        <meta name="csp-nonce" content="${nonce}">
+        <meta name="csp-policy" content="${csp}">
+        <script nonce="${nonce}">window.__CSP_NONCE__ = "${nonce}";</script>`;
+      html = html.replace("<head>", `<head>${metaTags}`);
 
       // SECURITY HEADERS
       const newHeaders = new Headers(response.headers);
@@ -135,7 +109,7 @@ export default {
     } catch (error) {
       console.error("Worker error:", error);
       return new Response(
-        `CSP Worker Error: ${error.message}. Check Cloudflare Functions logs.`,
+        `CSP Worker Error: ${error.message}. Check Vercel/Cloudflare Functions logs.`,
         { status: 500 }
       );
     }
