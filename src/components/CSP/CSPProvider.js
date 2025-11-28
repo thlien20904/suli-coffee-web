@@ -75,10 +75,10 @@ export const CSPProvider = ({ children }) => {
             ...prev,
             violations: [violation, ...prev.violations],
           }));
-            // ✅ Emit violation lên backend qua socket
-            if (socket) {
-              socket.emit("newViolation", violation);
-            }
+          // ✅ Emit violation lên backend qua socket
+          if (socket) {
+            socket.emit("newViolation", violation);
+          }
 
           if (!window.cspViolations) {
             window.cspViolations = [];
@@ -132,10 +132,10 @@ export const CSPProvider = ({ children }) => {
         ...prev,
         violations: [violation, ...prev.violations],
       }));
-        // ✅ Emit violation
-        if (socket) {
-          socket.emit("newViolation", violation);
-        }
+      // ✅ Emit violation
+      if (socket) {
+        socket.emit("newViolation", violation);
+      }
 
       if (!window.cspViolations) {
         window.cspViolations = [];
