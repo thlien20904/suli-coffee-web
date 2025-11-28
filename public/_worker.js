@@ -61,7 +61,7 @@ export default {
         /<style([^>]*)>([\s\S]*?)<\/style>/gi,
         (match, attrs, content) => {
           if (attrs.includes("nonce=")) return match;
-          const newTag = `<style${attrs}>${content}</style>`;  // BỎ NONCE CHO STYLE
+          const newTag = `<style${attrs}>${content}</style>`; // BỎ NONCE CHO STYLE
           if (content.trim()) {
             stylePromises.push(addHash(content, styleHashes));
           }
@@ -70,26 +70,47 @@ export default {
       );
       await Promise.all(stylePromises);
 
-      // DEBUG SCRIPT: TEST XSS + STYLE (INJECT VÀO <head>)
-      const debugScript = `<script nonce="${nonce}">
-        window.__CSP_NONCE__ = "${nonce}";
-        console.clear();
-        console.log("%c CSP ACTIVE - STYLE FIXED, UI SMOOTH! 🎉", "background:#00aa00;color:white;font-size:18px;padding:10px;border-radius:8px");
-        console.log("%c Nonce hiện tại:", "font-weight:bold", "${nonce}");
-        console.log("%c Test XSS script (bị chặn):", "color:red", "setTimeout(()=>{const s=document.createElement('script');s.textContent='alert(\\'XSS Blocked!\\')';document.head.appendChild(s);},2000)");
-        console.log("%c Test hợp pháp script (chạy):", "color:green", "setTimeout(()=>{const s=document.createElement('script');s.nonce='${nonce}';s.textContent='alert(\\'Legal Run!\\')';document.head.appendChild(s);},2500)");
-        console.log("%c Test inline style (chạy ok):", "color:blue", "setTimeout(()=>{const st=document.createElement('style');st.textContent='body { background: yellow; }';document.head.appendChild(st);},3000)");  // Test dynamic style
-      </script>`;
+      // Chèn script debug nonce + bắt sự kiện CSP vào <head>
+      const debugScript = `
+        <script nonce="${nonce}">
+          window.__CSP_NONCE__ = "${nonce}";
+          window.addEventListener("securitypolicyviolation", function(e) {
+            const logs = JSON.parse(localStorage.getItem("cspLogs") || "[]");
+            logs.push({
+              time: new Date().toISOString(),
+              documentURI: e.documentURI,
+              violatedDirective: e.violatedDirective,
+              blockedURI: e.blockedURI,
+              sourceFile: e.sourceFile,
+              lineNumber: e.lineNumber,
+              columnNumber: e.columnNumber,
+              disposition: e.disposition
+            });
+            localStorage.setItem("cspLogs", JSON.stringify(logs));
+          });
+          console.log("%c CSP God Mode ACTIVE ", "background:#00aa00;color:white;font-size:14px;padding:4px 8px;border-radius:4px;", 
+            "\nCurrent nonce:", "${nonce}".substring(0,16) + "...", 
+            "\nTime:", new Date().toLocaleTimeString("vi-VN"),
+            "\nPage:", location.pathname
+          );
+          console.log("%c Test hợp lệ (có nonce):", "color:green;font-weight:bold;", 
+            "const s = document.createElement('script'); s.nonce = window.__CSP_NONCE__; s.textContent = 'alert(\'Allowed!\')'; document.head.appendChild(s);"
+          );
+          console.log("%c Test bị chặn (không nonce):", "color:red;font-weight:bold;", 
+            "const s = document.createElement('script'); s.textContent = 'alert(\'Blocked!\')'; document.head.appendChild(s);"
+          );
+        </script>
+      `;
       html = html.replace("</head>", debugScript + "</head>");
 
       // CSP POLICY: SCRIPT CHẶT (NONCE + HASH), STYLE LỎNG (UNSAFE-INLINE + HASH)
       const csp = [
         "default-src 'self' blob: data:",
         `script-src 'self' 'nonce-${nonce}' ${[...scriptHashes].join(" ")}`,
-        `style-src 'self' 'unsafe-inline' ${[...styleHashes].join(" ")}`,  // BỎ NONCE, GIỮ UNSAFE-INLINE CHO DYNAMIC STYLES (REACT/SWEETALERT)
+        `style-src 'self' 'unsafe-inline' ${[...styleHashes].join(" ")}`, // BỎ NONCE, GIỮ UNSAFE-INLINE CHO DYNAMIC STYLES (REACT/SWEETALERT)
         "img-src * data: blob: https:",
         "font-src * data:",
-        "connect-src *",  // API/RENDER/SOCKET.IO
+        "connect-src *", // API/RENDER/SOCKET.IO
         "media-src * blob:",
         "object-src 'none'",
         "base-uri 'self'",
