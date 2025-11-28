@@ -25,6 +25,7 @@ function setupMiddleware(app, io) {
         "http://localhost:3000",
         "http://localhost:5000",
         "https://suli-coffee.vercel.app",
+        "https://suli-coffee-web.pages.dev", // Cloudflare Pages
         "https://suli-coffee.onrender.com",
         process.env.REACT_APP_BACKEND_URL,
         process.env.REACT_APP_FRONTEND_URL,
