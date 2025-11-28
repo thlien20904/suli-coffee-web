@@ -1,4 +1,4 @@
-// frontend/src/components/CSP/CSPProvider.js - CSP Protection Provider for React
+// frontend/src/components/CSP/CSPProvider.js - CSP Protection Provider for React (FIX: EARLY LISTENER + PRIORITIZE META NONCE + LOCAL-ONLY FOR FAIL/PASS)
 import React, { createContext, useContext, useEffect, useState } from "react";
 import io from "socket.io-client";
 
@@ -36,8 +36,10 @@ export const CSPProvider = ({ children }) => {
         ? "https://suli-coffee.onrender.com"
         : "http://localhost:5000");
 
-    // Listen for CSP violations in browser
+    // Listen for CSP violations in browser (FIX: USE CAPTURE PHASE ĐỂ CATCH EARLY, TRƯỚC KHI REACT MOUNT)
     const handleViolation = (event) => {
+      console.log('🔍 Violation event fired (early capture):', event); // DEBUG: CHECK IF FIRES ON CLOUDFLARE
+
       // Create base key (không có timestamp)
       const baseKey = `${event.blockedURI}|${event.violatedDirective}|${event.documentURI}`;
 
@@ -61,7 +63,7 @@ export const CSPProvider = ({ children }) => {
         }
       }, 500);
 
-      // Add to local violations
+      // Add to local violations (LOCAL-ONLY, NO BACKEND CALL ĐỂ TRÁNH 404)
       const violation = {
         id: `violation-${Date.now()}-${Math.random()}`,
         "blocked-uri": event.blockedURI,
@@ -75,7 +77,7 @@ export const CSPProvider = ({ children }) => {
 
       setCSPLogs((prev) => ({
         ...prev,
-        violations: [violation, ...prev.violations],
+        violations: [violation, ...prev.violations.slice(0, 50)], // LIMIT ARRAY ĐỂ TRÁNH LAG, GIỮ MỚI NHẤT
       }));
 
       // Expose to window for easy access
@@ -83,87 +85,86 @@ export const CSPProvider = ({ children }) => {
         window.cspViolations = [];
       }
       window.cspViolations.unshift(violation);
+      window.cspViolations = window.cspViolations.slice(0, 50); // LIMIT GLOBAL TOO
 
-      // Cache nonce từ violation đầu tiên
-      if (!window.__cspNonce && event.originalPolicy) {
+      // Cache nonce từ violation đầu tiên (UPDATE IMMEDIATE)
+      if (event.originalPolicy) {
         const match = event.originalPolicy.match(/'nonce-([^']+)'/);
         if (match) {
           window.__cspNonce = match[1];
+          console.log('🔍 Updated nonce from violation:', window.__cspNonce); // DEBUG
         }
       }
-      // Gửi log violation lên backend
-      fetch(`${backendUrl}/api/log-violation`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(violation),
-      }).catch((err) => console.warn("Failed to log CSP violation:", err));
     };
 
     // Listen for CSP pass events (from window.testCSPNonce)
     const handlePass = (event) => {
+      console.log('🔍 Pass event fired:', event.detail); // DEBUG
       const passLog = event.detail;
 
-      setCSPLogs((prev) => {
-        const newState = {
-          ...prev,
-          passes: [passLog, ...prev.passes],
-        };
-        return newState;
-      });
+      setCSPLogs((prev) => ({
+        ...prev,
+        passes: [passLog, ...prev.passes.slice(0, 50)], // LIMIT ARRAY
+      }));
     };
 
-    document.addEventListener("securitypolicyviolation", handleViolation);
-    window.addEventListener("csp-pass", handlePass);
+    // ADD LISTENER EARLY WITH CAPTURE PHASE (FIX CLOUDFLARE TIMING ISSUE)
+    document.addEventListener("securitypolicyviolation", handleViolation, { capture: true, passive: true });
+    window.addEventListener("csp-pass", handlePass, { capture: true, passive: true });
 
-    // Connect to Socket.IO for CSP monitoring (dùng backendUrl đã khai báo ở trên)
-    const socketConnection = io(backendUrl, {
-      transports: ["websocket", "polling"],
-      withCredentials: true,
-      forceNew: true,
-    });
+    // Connect to Socket.IO for CSP monitoring (dùng backendUrl đã khai báo ở trên) - OPTIONAL, CATCH ERROR
+    let socketConnection;
+    if (!isProduction) { // SKIP SOCKET ON PROD IF NO BACKEND
+      socketConnection = io(backendUrl, {
+        transports: ["websocket", "polling"],
+        withCredentials: true,
+        forceNew: true,
+      });
 
-    socketConnection.on("connect", () => {
-      setCSPLogs((prev) => ({ ...prev, connected: true }));
-    });
+      socketConnection.on("connect", () => {
+        setCSPLogs((prev) => ({ ...prev, connected: true }));
+      });
 
-    socketConnection.on("disconnect", () => {
-      setCSPLogs((prev) => ({ ...prev, connected: false }));
-    });
+      socketConnection.on("disconnect", () => {
+        setCSPLogs((prev) => ({ ...prev, connected: false }));
+      });
 
-    socketConnection.on("connect_error", (error) => {
-      setCSPLogs((prev) => ({ ...prev, connected: false }));
-    });
+      socketConnection.on("connect_error", (error) => {
+        console.warn('Socket connect error (ignored on prod):', error);
+        setCSPLogs((prev) => ({ ...prev, connected: false }));
+      });
 
-    socketConnection.on("initLogs", (data) => {
-      setCSPLogs((prev) => ({
-        ...prev,
-        violations: data.violations || [],
-        passes: data.passes || [],
-      }));
-    });
+      socketConnection.on("initLogs", (data) => {
+        setCSPLogs((prev) => ({
+          ...prev,
+          violations: data.violations || [],
+          passes: data.passes || [],
+        }));
+      });
 
-    socketConnection.on("newViolation", (violation) => {
-      setCSPLogs((prev) => ({
-        ...prev,
-        violations: [violation, ...prev.violations],
-      }));
-    });
+      socketConnection.on("newViolation", (violation) => {
+        setCSPLogs((prev) => ({
+          ...prev,
+          violations: [violation, ...prev.violations],
+        }));
+      });
 
-    socketConnection.on("scriptPass", (passLog) => {
-      setCSPLogs((prev) => ({
-        ...prev,
-        passes: [passLog, ...prev.passes],
-      }));
-    });
+      socketConnection.on("scriptPass", (passLog) => {
+        setCSPLogs((prev) => ({
+          ...prev,
+          passes: [passLog, ...prev.passes],
+        }));
+      });
 
-    setSocket(socketConnection);
+      setSocket(socketConnection);
+    }
 
     // Store nonce globally khi detect từ violations
     if (!window.__cspNonce) {
       window.__cspNonce = null;
     }
 
-    // 🔥 Global helper functions for CSP testing
+    // 🔥 Global helper functions for CSP testing (LOCAL-ONLY, NO FETCH BACKEND ĐỂ TRÁNH 404)
     window.getCSPNonce = () => {
       // Check if running on static hosting (Vercel) - no nonce support
       const isStaticHosting =
@@ -176,7 +177,18 @@ export const CSPProvider = ({ children }) => {
         return null;
       }
 
-      // Method 1: Return cached nonce
+      // FIX: ALWAYS PRIORITIZE META TAG FIRST (FRESH PER LOAD), UPDATE CACHE
+      const meta = document.querySelector('meta[name="csp-nonce"]');
+      if (meta) {
+        const nonce = meta.getAttribute("content");
+        if (nonce && nonce !== "__NONCE__") {
+          window.__cspNonce = nonce;
+          console.log("✅ Fresh nonce from meta tag:", nonce); // DEBUG FOR TAB UPDATE
+          return nonce;
+        }
+      }
+
+      // Method 1: Return cached nonce (if meta failed)
       if (window.__cspNonce) {
         return window.__cspNonce;
       }
@@ -203,17 +215,6 @@ export const CSPProvider = ({ children }) => {
           window.__cspNonce = match[1];
           console.log("✅ Nonce found from CSP violation");
           return match[1];
-        }
-      }
-
-      // Method 4: Try meta tag
-      const meta = document.querySelector('meta[name="csp-nonce"]');
-      if (meta) {
-        const nonce = meta.getAttribute("content");
-        if (nonce && nonce !== "__NONCE__") {
-          window.__cspNonce = nonce;
-          console.log("✅ Nonce found from meta tag");
-          return nonce;
         }
       }
 
@@ -256,27 +257,14 @@ export const CSPProvider = ({ children }) => {
       `;
       document.documentElement.appendChild(script);
 
-      // Check if script executed and log as pass
+      // Check if script executed and log as pass (LOCAL-ONLY, NO FETCH)
       setTimeout(() => {
         if (window[testId]) {
-          // Log pass event to backend
-          const backendUrl =
-            process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
-          fetch(`${backendUrl}/api/log-pass`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              page: window.location.pathname,
-              directive: `script-src with nonce-${nonce.substring(0, 10)}...`,
-              timestamp: new Date().toISOString(),
-            }),
-          }).catch((err) => console.warn("Failed to log CSP pass:", err));
-
           // Update local state
           const passLog = {
             id: `pass-${Date.now()}-${Math.random()}`,
             page: window.location.pathname,
-            directive: `script-src with nonce`,
+            directive: `script-src with nonce-${nonce.substring(0, 10)}...`,
             timestamp: new Date().toISOString(),
             status: "pass",
           };
@@ -285,6 +273,8 @@ export const CSPProvider = ({ children }) => {
           window.dispatchEvent(
             new CustomEvent("csp-pass", { detail: passLog })
           );
+
+          console.log('✅ Pass logged locally:', passLog); // DEBUG
         }
 
         delete window[testId];
@@ -317,7 +307,7 @@ export const CSPProvider = ({ children }) => {
 
     // CSP Helpers available: window.getCSPNonce(), window.testCSPNonce(), window.testManualNonce()
 
-    // Intercept appendChild để track scripts với nonce
+    // Intercept appendChild để track scripts với nonce (LOCAL-ONLY, NO FETCH)
     const originalAppendChild = Element.prototype.appendChild;
     Element.prototype.appendChild = function (child) {
       // Check nếu là script element với nonce
@@ -353,13 +343,9 @@ export const CSPProvider = ({ children }) => {
               new CustomEvent("csp-pass", { detail: passLog })
             );
 
-            const backendUrl =
-              process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
-            fetch(`${backendUrl}/api/log-pass`, {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify(passLog),
-            }).catch(() => {});
+            console.log('✅ Intercept pass logged:', passLog); // DEBUG
+
+            // NO FETCH BACKEND (AVOID 404)
           }
         }, 50);
 
@@ -371,41 +357,47 @@ export const CSPProvider = ({ children }) => {
     };
 
     return () => {
-      document.removeEventListener("securitypolicyviolation", handleViolation);
-      window.removeEventListener("csp-pass", handlePass);
+      document.removeEventListener("securitypolicyviolation", handleViolation, { capture: true });
+      window.removeEventListener("csp-pass", handlePass, { capture: true });
       Element.prototype.appendChild = originalAppendChild;
-      socketConnection.disconnect();
+      if (socketConnection) socketConnection.disconnect();
     };
   }, []);
 
-  // Log CSP pass events
+  // Log CSP pass events (LOCAL-ONLY)
   const logCSPPass = (page, directive) => {
     const passLog = {
       page: page || window.location.pathname,
       directive: directive || "script-src",
-      timestamp: new Date().toLocaleString("vi-VN"),
+      timestamp: new Date().toISOString(),
       status: "pass",
     };
 
-    // Send to backend
-    const backendUrl =
-      process.env.REACT_APP_BACKEND_URL || "http://localhost:5000";
-    fetch(`${backendUrl}/api/log-pass`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(passLog),
-    }).catch((err) => console.warn("Failed to log CSP pass:", err));
+    setCSPLogs((prev) => ({
+      ...prev,
+      passes: [passLog, ...prev.passes.slice(0, 50)],
+    }));
+
+    // NO BACKEND FETCH (AVOID 404)
   };
 
-  // Get CSP nonce from meta tag (if available)
+  // Get CSP nonce from meta tag (if available) - PRIORITIZE META
   const getCSPNonce = () => {
-    const metaNonce = document.querySelector('meta[name="csp-nonce"]');
-    return metaNonce ? metaNonce.getAttribute("content") : null;
+    // FIX: ALWAYS CHECK META FIRST & UPDATE CACHE
+    const meta = document.querySelector('meta[name="csp-nonce"]');
+    if (meta) {
+      const nonce = meta.getAttribute("content");
+      if (nonce && nonce !== "__NONCE__") {
+        window.__cspNonce = nonce;
+        return nonce;
+      }
+    }
+
+    // Fallback to global cache or other methods
+    return window.__cspNonce || null;
   };
 
-  // Safe script execution with CSP
+  // Safe script execution with CSP (LOCAL-ONLY)
   const executeScript = (scriptContent, options = {}) => {
     try {
       const script = document.createElement("script");
@@ -427,7 +419,7 @@ export const CSPProvider = ({ children }) => {
 
       document.head.appendChild(script);
 
-      // Log success
+      // Log success locally
       logCSPPass(window.location.pathname, "script-src");
 
       return true;
