@@ -87,11 +87,38 @@ export default {
         "block-all-mixed-content",
       ].join("; ");
 
-      // INJECT META TAGS CHO HASH&NONCE TAB + SET WINDOW NONCE (KHÔNG TEST/LOG)
+      // INJECT META TAGS + CSP VIOLATION LISTENER (CHẠY TRƯỚC REACT MOUNT)
       const metaTags = `
         <meta name="csp-nonce" content="${nonce}">
         <meta name="csp-policy" content="${csp}">
-        <script nonce="${nonce}">window.__CSP_NONCE__ = "${nonce}";</script>`;
+        <script nonce="${nonce}">
+          window.__CSP_NONCE__ = "${nonce}";
+          window.cspViolations = window.cspViolations || [];
+          window.cspPasses = window.cspPasses || [];
+          
+          // Lắng nghe CSP violations ngay khi page load
+          document.addEventListener("securitypolicyviolation", function(e) {
+            const violation = {
+              id: "violation-" + Date.now() + "-" + Math.random(),
+              "blocked-uri": e.blockedURI,
+              "violated-directive": e.violatedDirective,
+              "effective-directive": e.effectiveDirective,
+              "document-uri": e.documentURI,
+              "original-policy": e.originalPolicy,
+              timestamp: new Date().toISOString(),
+              status: "fail"
+            };
+            window.cspViolations.unshift(violation);
+            console.log("🔴 CSP Violation (from worker listener):", violation);
+            
+            // Dispatch custom event để React Provider nhận được
+            window.dispatchEvent(new CustomEvent("csp-violation-detected", { detail: violation }));
+          });
+          
+          console.log("%c✅ CSP Worker Active", "background:#00aa00;color:white;font-size:14px;padding:4px 8px;", 
+            "\\nNonce:", "${nonce}".substring(0,16) + "...",
+            "\\nTime:", new Date().toLocaleTimeString("vi-VN"));
+        </script>`;
       html = html.replace("<head>", `<head>${metaTags}`);
 
       // SECURITY HEADERS

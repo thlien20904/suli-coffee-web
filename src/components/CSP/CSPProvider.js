@@ -159,6 +159,17 @@ export const CSPProvider = ({ children }) => {
     document.addEventListener("securitypolicyviolation", handleViolation);
     window.addEventListener("csp-pass", handlePass);
 
+    // 🔥 FIX: Listen custom event từ _worker.js (để đảm bảo violation được nhận)
+    const handleWorkerViolation = (event) => {
+      const violation = event.detail;
+      setCSPLogs((prev) => ({
+        ...prev,
+        violations: [violation, ...prev.violations],
+      }));
+      console.log("✅ Violation received from worker:", violation);
+    };
+    window.addEventListener("csp-violation-detected", handleWorkerViolation);
+
     // Connect to Socket.IO
     const isProduction =
       window.location.hostname.includes("vercel.app") ||
@@ -416,6 +427,7 @@ export const CSPProvider = ({ children }) => {
     return () => {
       document.removeEventListener("securitypolicyviolation", handleViolation);
       window.removeEventListener("csp-pass", handlePass);
+      window.removeEventListener("csp-violation-detected", handleWorkerViolation);
       Element.prototype.appendChild = originalAppendChild;
       console.error = originalConsoleError; // ✅ Restore console.error
       socketConnection.disconnect();

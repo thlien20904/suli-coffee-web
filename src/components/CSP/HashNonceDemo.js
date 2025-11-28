@@ -299,6 +299,14 @@ const HashNonceDemo = () => {
   }, [violations]); // Tự động refresh khi có violation mới
 
   useEffect(() => {
+    // ✅ Check window.__CSP_NONCE__ ngay khi mount (từ worker)
+    if (window.__CSP_NONCE__ && !currentNonce) {
+      console.log("🔑 Initial nonce from worker:", window.__CSP_NONCE__);
+      setCurrentNonce(window.__CSP_NONCE__);
+    }
+  }, []);
+
+  useEffect(() => {
     // Auto-refresh nonce khi có violations mới hoặc worker inject (real-time)
     const interval = setInterval(() => {
       // ✅ Ưu tiên: Check window.__CSP_NONCE__ trước
