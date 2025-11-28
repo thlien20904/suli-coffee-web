@@ -234,27 +234,44 @@ const HashNonceDemo = () => {
   };
 
   // Refresh nonce (thử nhiều nguồn)
+  // Refresh nonce (thử nhiều nguồn)
   const refreshNonce = async () => {
     console.log("🔄 Refreshing nonce...");
 
-    // 1. Thử lấy từ meta tag trước
-    let nonce = getNonceFromMeta();
-
-    // 2. Thử từ violations log
-    if (!nonce) {
-      nonce = getNonceFromViolations();
+    // ✅ 1. ƯU TIÊN: Thử lấy từ window.__CSP_NONCE__ (worker inject) TRƯỚC
+    let nonce = window.__CSP_NONCE__ || null;
+    if (nonce) {
+      console.log("🔑 Nonce from window.__CSP_NONCE__ (Worker):", nonce);
+      setCurrentNonce(nonce);
+      return;
     }
 
-    // 3. Thử từ CSPProvider
-    if (!nonce && getCSPNonce) {
+    // 2. Thử lấy từ meta tag
+    nonce = getNonceFromMeta();
+    if (nonce) {
+      setCurrentNonce(nonce);
+      return;
+    }
+
+    // 3. Thử từ violations log
+    nonce = getNonceFromViolations();
+    if (nonce) {
+      setCurrentNonce(nonce);
+      return;
+    }
+
+    // 4. Thử từ CSPProvider
+    if (getCSPNonce) {
       nonce = getCSPNonce();
+      if (nonce) {
+        setCurrentNonce(nonce);
+        return;
+      }
     }
 
-    // 4. Cuối cùng: Extract từ CSP error message
-    if (!nonce) {
-      console.log("🔍 Extracting nonce from CSP error...");
-      nonce = await extractNonceFromCSPError();
-    }
+    // 5. Cuối cùng: Extract từ CSP error message
+    console.log("🔍 Extracting nonce from CSP error...");
+    nonce = await extractNonceFromCSPError();
 
     if (nonce) {
       setCurrentNonce(nonce);
@@ -282,14 +299,25 @@ const HashNonceDemo = () => {
   }, [violations]); // Tự động refresh khi có violation mới
 
   useEffect(() => {
-    // Auto-refresh nonce khi có violations mới (real-time)
+    // Auto-refresh nonce khi có violations mới hoặc worker inject (real-time)
     const interval = setInterval(() => {
+      // ✅ Ưu tiên: Check window.__CSP_NONCE__ trước
+      if (window.__CSP_NONCE__ && window.__CSP_NONCE__ !== currentNonce) {
+        console.log(
+          "🔄 Auto-detected new nonce from Worker:",
+          window.__CSP_NONCE__
+        );
+        setCurrentNonce(window.__CSP_NONCE__);
+        return;
+      }
+
+      // Fallback: Check từ violations
       const newNonce = getNonceFromViolations();
       if (newNonce && newNonce !== currentNonce) {
-        console.log("🔄 Auto-detected new nonce:", newNonce);
+        console.log("🔄 Auto-detected new nonce from violations:", newNonce);
         setCurrentNonce(newNonce);
       }
-    }, 1000);
+    }, 1000); // Poll mỗi giây
 
     return () => clearInterval(interval);
   }, [violations, currentNonce]);
@@ -362,8 +390,8 @@ const HashNonceDemo = () => {
 
   // Test 2: Inline script with valid nonce (should work if CSP allows)
   const testInlineWithValidNonce = () => {
-    // Thử lấy nonce từ nhiều nguồn
-    let nonce = getNonceFromMeta() || getNonceFromCSPHeader() || currentNonce;
+    // ✅ Thử lấy nonce từ nhiều nguồn (ưu tiên window.__CSP_NONCE__)
+    let nonce = window.__CSP_NONCE__ || getNonceFromMeta() || currentNonce;
 
     if (!nonce || nonce === "⚠️ Nonce không khả dụng") {
       addTestResult(
@@ -539,7 +567,12 @@ const HashNonceDemo = () => {
             </button>
           </div>
           <div className="nonce-hint">
-            💡 Nonce được lấy từ: CSP violations log → Meta tag → CSPProvider
+            💡 Nonce được lấy từ:
+            {window.__CSP_NONCE__ ? (
+              <strong> Cloudflare Worker (window.__CSP_NONCE__)</strong>
+            ) : (
+              <span> CSP violations log → Meta tag → CSPProvider</span>
+            )}
             <br />
             {currentNonce === "⚠️ Nonce không khả dụng" && (
               <span className="warning-text">
