@@ -38,11 +38,14 @@ const server = http.createServer(app);
 // Initialize Socket.IO
 const io = new socketIO.Server(server, {
   cors: {
-    origin: ["http://localhost:3000", "https://suli-coffee.vercel.app"],
+    origin: [
+      "http://localhost:3000",
+      "https://suli-coffee.vercel.app",
+      "https://suli-coffee-web.pages.dev"
+    ],
     credentials: true,
   },
 });
-
 // Initialize Socket.IO with real-time features
 console.log("🔌 Initializing Socket.IO real-time features...");
 const socketManager = initializeSocketIO(io);
