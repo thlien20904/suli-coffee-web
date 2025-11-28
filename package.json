@@ -3,8 +3,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "set WDS_SOCKET=false&&react-scripts start",
-    "build": "react-scripts build",
-    "serve": "node server.js",
+"build": "react-scripts build && cp public/_worker.js build/",    "serve": "node server.js",
     "build-hash": "node scripts/build-hash.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
