@@ -1,4 +1,4 @@
-// public/_worker.js – FINAL CLEAN: META NONCE/POLICY CHO HASH&NONCE TAB, NO CONSOLE TESTS
+// public/_worker.js – FINAL CLEAN: FIX EXTERNAL STYLES BLOCK + META NONCE/POLICY CHO HASH&NONCE TAB, NO CONSOLE TESTS
 export default {
   async fetch(request, env, ctx) {
     try {
@@ -70,13 +70,13 @@ export default {
       );
       await Promise.all(stylePromises);
 
-      // CSP POLICY: SCRIPT CHẶT (NONCE + HASH), STYLE LỎNG (UNSAFE-INLINE + HASH)
+      // CSP POLICY: SCRIPT CHẶT (NONCE + HASH), STYLE MỞ RỘNG (UNSAFE-INLINE + EXTERNAL CDN/FONTS + HASH)
       const csp = [
         "default-src 'self' blob: data:",
         `script-src 'self' 'nonce-${nonce}' ${[...scriptHashes].join(" ")}`,
-        `style-src 'self' 'unsafe-inline' ${[...styleHashes].join(" ")}`, // BỎ NONCE, GIỮ UNSAFE-INLINE CHO DYNAMIC STYLES (REACT/SWEETALERT)
+        `style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com ${[...styleHashes].join(" ")}`, // FIX: ALLOW EXTERNAL STYLES (FONT-AWESOME, GOOGLE FONTS), GIỮ UNSAFE-INLINE CHO DYNAMIC (REACT/SWEETALERT)
         "img-src * data: blob: https:",
-        "font-src * data:",
+        "font-src * data: https://fonts.gstatic.com", // ALLOW FONTS.GOOGLEAPIS.COM FONTS
         "connect-src *", // API/RENDER/SOCKET.IO (KHÔNG DÙNG TRONG TEST VERCEL)
         "media-src * blob:",
         "object-src 'none'",

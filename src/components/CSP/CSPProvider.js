@@ -80,6 +80,12 @@ export const CSPProvider = ({ children }) => {
           window.__cspNonce = match[1];
         }
       }
+      // Gửi log violation lên backend
+      fetch(`${backendUrl}/api/log-violation`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(violation),
+      }).catch((err) => console.warn("Failed to log CSP violation:", err));
     };
 
     // Listen for CSP pass events (from window.testCSPNonce)
