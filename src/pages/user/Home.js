@@ -23,7 +23,7 @@ export default function Home() {
   const bannerVideos = [
     { src: "/video/vd6.mp4", alt: "SuLi Coffee Video 1" },
     { src: "/video/vd.mp4", alt: "SuLi Coffee Video 2" },
-    { src: "/video/vd2.mp4", alt: "SuLi Coffee Video 3" },
+    { src: "/video/vd9.mp4", alt: "SuLi Coffee Video 3" },
   ];
 
   const videoRefs = useRef([]);
