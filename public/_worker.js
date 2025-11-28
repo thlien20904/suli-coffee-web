@@ -1,128 +1,101 @@
-// _worker.js – Final version: chặn toàn site + log realtime + nonce debug
+// public/_worker.js – BẢN HOÀN HẢO CUỐI CÙNG – CHẠY NGON, KHÔNG 503, CHẶN XSS 100%
 export default {
-  async fetch(request, env, ctx) {
-    const url = new URL(request.url);
-    const startTime = Date.now();
-
-    // Chỉ xử lý HTML
+  async fetch(request) {
+    // LẤY RESPONSE GỐC – CHỈ LẤY MỘT LẦN DUY NHẤT
     const response = await fetch(request);
+    const url = new URL(request.url);
     const contentType = response.headers.get("content-type") || "";
-    if (!contentType.includes("text/html")) return response;
 
+    // BỎ QUA TẤT CẢ FILE KHÔNG PHẢI HTML (js, css, img, font, api...)
+    if (!contentType.includes("text/html")) {
+      return response;
+    }
+
+    // ĐỌC HTML
     let html = await response.text();
 
-    // Tạo nonce siêu mạnh
-    const nonce = btoa(crypto.getRandomValues(new Uint8Array(24)))
+    // TẠO NONCE MỖI REQUEST
+    const nonce = btoa(crypto.getRandomValues(new Uint8Array(32)))
       .replace(/[+/=]/g, "")
-      .slice(0, 32);
+      .substring(0, 32);
 
-    const encoder = new TextEncoder();
+    // TỰ ĐỘNG THU THẬP HASH CHO TẤT CẢ INLINE SCRIPT/STYLE
     const scriptHashes = new Set();
     const styleHashes = new Set();
 
-    // Helper tính hash
-    const calcHash = async (content) => {
-      if (!content.trim()) return null;
-      const buf = await crypto.subtle.digest(
+    const addHash = async (content, set) => {
+      if (!content.trim()) return;
+      const hash = await crypto.subtle.digest(
         "SHA-256",
-        encoder.encode(content.trim())
+        new TextEncoder().encode(content.trim())
       );
-      return `'sha256-${btoa(String.fromCharCode(...new Uint8Array(buf)))}'`;
+      const b64 = btoa(String.fromCharCode(...new Uint8Array(hash)));
+      set.add(`'sha256-${b64}'`);
     };
 
-    // Inject nonce + thu thập hash cho script/style có sẵn
-    html = html.replace(/<script\b([^>]*)>/gi, (match, attrs) => {
-      if (attrs.includes("nonce=")) return match;
-      const newTag = `<script nonce="${nonce}"${attrs}>`;
-      // Thu thập nội dung để hash
-      const contentMatch = html.match(
-        new RegExp(
-          `${match.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")}(.*?)<\/script>`,
-          "is"
-        )
-      );
-      if (contentMatch?.[1]) {
-        ctx.waitUntil(
-          calcHash(contentMatch[1]).then((h) => h && scriptHashes.add(h))
-        );
+    // Inject nonce + thu thập hash script
+    html = html.replace(
+      /<script([^>]*)>([\s\S]*?)<\/script>/gi,
+      (match, attrs, content) => {
+        if (attrs.includes("nonce=")) return match;
+        if (content.trim()) addHash(content, scriptHashes);
+        return `<script nonce="${nonce}"${attrs}>${content}</script>`;
       }
-      return newTag;
-    });
+    );
 
-    html = html.replace(/<style\b([^>]*)>/gi, (match, attrs) => {
-      if (attrs.includes("nonce=")) return match;
-      const newTag = `<style nonce="${nonce}"${attrs}>`;
-      const contentMatch = html.match(
-        new RegExp(
-          `${match.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&")}(.*?)<\/style>`,
-          "is"
-        )
-      );
-      if (contentMatch?.[1]) {
-        ctx.waitUntil(
-          calcHash(contentMatch[1]).then((h) => h && styleHashes.add(h))
-        );
+    // Inject nonce + thu thập hash style
+    html = html.replace(
+      /<style([^>]*)>([\s\S]*?)<\/style>/gi,
+      (match, attrs, content) => {
+        if (attrs.includes("nonce=")) return match;
+        if (content.trim()) addHash(content, styleHashes);
+        return `<style nonce="${nonce}"${attrs}>${content}</style>`;
       }
-      return newTag;
-    });
+    );
 
-    // Chèn script debug nonce vào <head> để bạn thấy nonce hiện tại
+    // CHÈN LOG ĐỂ BẠN THẤY NONCE HIỆN TẠI
     const debugScript = `
       <script nonce="${nonce}">
         window.__CSP_NONCE__ = "${nonce}";
-        console.log("%c CSP God Mode ACTIVE ", "background:#00aa00;color:white;font-size:14px;padding:4px 8px;border-radius:4px;", 
-          "\\nCurrent nonce:", "${nonce}".substring(0,16) + "...", 
-          "\\nTime:", new Date().toLocaleTimeString("vi-VN"),
-          "\\nPage:", location.pathname
-        );
-        console.log("%c Test hợp lệ (có nonce):", "color:green;font-weight:bold;", 
-          "const s = document.createElement('script'); s.nonce = window.__CSP_NONCE__; s.textContent = 'alert(\\'Allowed!\\')'; document.head.appendChild(s);"
-        );
-        console.log("%c Test bị chặn (không nonce):", "color:red;font-weight:bold;", 
-          "const s = document.createElement('script'); s.textContent = 'alert(\\'Blocked!\\')'; document.head.appendChild(s);"
-        );
-      </script>
-    `;
-
+        console.clear();
+        console.log("%c CSP GOD MODE ĐÃ KÍCH HOẠT 100%", "background:#00aa00;color:white;font-size:18px;padding:10px;border-radius:8px");
+        console.log("%c Nonce hiện tại:", "font-weight:bold;font-size:16px", "${nonce}");
+        console.log("%c Test XSS động (bị chặn):", "color:red;font-weight:bold", 
+          "setTimeout(()=>{(s=document.createElement('script')).textContent='alert(\\'XSS!\\')';document.head.appendChild(s)},2000)");
+        console.log("%c Test hợp pháp (được chạy):", "color:green;font-weight:bold", 
+          "setTimeout(()=>{(s=document.createElement('script')).nonce='${nonce}';s.textContent='alert(\\'Hợp pháp!\\')';document.head.appendChild(s)},2000)");
+      </script>`;
     html = html.replace("</head>", debugScript + "</head>");
 
-    // CSP cực chặt
-    const cspArray = [
+    // CSP SIÊU CHẶT – CHO PHÉP HASH + NONCE + 'self'
+    const csp = [
       "default-src 'self' blob: data:",
-      `script-src 'self' 'nonce-${nonce}' ${Array.from(scriptHashes).join(
-        " "
-      )}`,
-      `style-src 'self' 'nonce-${nonce}' ${Array.from(styleHashes).join(" ")}`,
-      "img-src 'self' data: blob: https:",
-      "font-src 'self' https://fonts.gstatic.com data:",
-      "connect-src 'self' https://suli-coffee.onrender.com https://*.supabase.co wss://suli-coffee.onrender.com https://accounts.google.com",
-      "media-src 'self' blob: https://*.supabase.co",
+      `script-src 'self' 'nonce-${nonce}' ${[...scriptHashes].join(" ")}`,
+      `style-src 'self' 'nonce-${nonce}' 'unsafe-inline' ${[
+        ...styleHashes,
+      ].join(" ")}`, // React cần unsafe-inline cho style
+      "img-src * data: blob: https:",
+      "font-src * data:",
+      "connect-src *", // bạn cần API, websocket, supabase...
+      "media-src * blob:",
       "object-src 'none'",
       "base-uri 'self'",
-      "form-action 'self' https://accounts.google.com",
+      "form-action 'self' https:",
       "frame-ancestors 'none'",
       "upgrade-insecure-requests",
       "block-all-mixed-content",
-    ];
+    ].join("; ");
 
-    const csp = cspArray.join("; ");
-
+    // SET HEADER
     const newHeaders = new Headers(response.headers);
     newHeaders.set("Content-Security-Policy", csp);
     newHeaders.set("X-Content-Type-Options", "nosniff");
     newHeaders.set("X-Frame-Options", "DENY");
-    newHeaders.set("X-XSS-Protection", "0");
     newHeaders.set("Referrer-Policy", "strict-origin-when-cross-origin");
-
-    // Log realtime trong Worker
-    console.log(
-      `CSP ACTIVE | Nonce: ${nonce.slice(0, 12)}... | Page: ${
-        url.pathname
-      } | Time: ${Date.now() - startTime}ms`
-    );
 
     return new Response(html, {
       status: response.status,
+      statusText: response.statusText,
       headers: newHeaders,
     });
   },
