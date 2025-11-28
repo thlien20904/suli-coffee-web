@@ -25,6 +25,17 @@ export const CSPProvider = ({ children }) => {
     // Track processed violations to avoid duplicates (CSP fires twice per violation)
     const processedViolations = new Map(); // Use Map to store timestamp
 
+    // Khai báo backendUrl ở đầu để có thể dùng trong handleViolation
+    const isProduction =
+      window.location.hostname.includes("vercel.app") ||
+      window.location.hostname.includes("pages.dev") ||
+      process.env.NODE_ENV === "production";
+    const backendUrl =
+      process.env.REACT_APP_BACKEND_URL ||
+      (isProduction
+        ? "https://suli-coffee.onrender.com"
+        : "http://localhost:5000");
+
     // Listen for CSP violations in browser
     const handleViolation = (event) => {
       // Create base key (không có timestamp)
@@ -104,16 +115,7 @@ export const CSPProvider = ({ children }) => {
     document.addEventListener("securitypolicyviolation", handleViolation);
     window.addEventListener("csp-pass", handlePass);
 
-    // Connect to Socket.IO for CSP monitoring
-    const isProduction =
-      window.location.hostname.includes("vercel.app") ||
-      process.env.NODE_ENV === "production";
-    const backendUrl =
-      process.env.REACT_APP_BACKEND_URL ||
-      (isProduction
-        ? "https://suli-coffee.onrender.com"
-        : "http://localhost:5000");
-
+    // Connect to Socket.IO for CSP monitoring (dùng backendUrl đã khai báo ở trên)
     const socketConnection = io(backendUrl, {
       transports: ["websocket", "polling"],
       withCredentials: true,

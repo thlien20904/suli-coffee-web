@@ -279,8 +279,10 @@ const HashNonceDemo = () => {
 
   useEffect(() => {
     refreshNonce();
+  }, [violations]); // Tự động refresh khi có violation mới
 
-    // Auto-refresh nonce khi có violations mới
+  useEffect(() => {
+    // Auto-refresh nonce khi có violations mới (real-time)
     const interval = setInterval(() => {
       const newNonce = getNonceFromViolations();
       if (newNonce && newNonce !== currentNonce) {
