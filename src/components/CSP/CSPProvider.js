@@ -427,7 +427,10 @@ export const CSPProvider = ({ children }) => {
     return () => {
       document.removeEventListener("securitypolicyviolation", handleViolation);
       window.removeEventListener("csp-pass", handlePass);
-      window.removeEventListener("csp-violation-detected", handleWorkerViolation);
+      window.removeEventListener(
+        "csp-violation-detected",
+        handleWorkerViolation
+      );
       Element.prototype.appendChild = originalAppendChild;
       console.error = originalConsoleError; // ✅ Restore console.error
       socketConnection.disconnect();

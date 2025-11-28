@@ -74,7 +74,9 @@ export default {
       const csp = [
         "default-src 'self' blob: data:",
         `script-src 'self' 'nonce-${nonce}' ${[...scriptHashes].join(" ")}`,
-        `style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com ${[...styleHashes].join(" ")}`, // FIX: ALLOW EXTERNAL STYLES (FONT-AWESOME, GOOGLE FONTS), GIỮ UNSAFE-INLINE CHO DYNAMIC (REACT/SWEETALERT)
+        `style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com ${[
+          ...styleHashes,
+        ].join(" ")}`, // FIX: ALLOW EXTERNAL STYLES (FONT-AWESOME, GOOGLE FONTS), GIỮ UNSAFE-INLINE CHO DYNAMIC (REACT/SWEETALERT)
         "img-src * data: blob: https:",
         "font-src * data: https://fonts.gstatic.com", // ALLOW FONTS.GOOGLEAPIS.COM FONTS
         "connect-src *", // API/RENDER/SOCKET.IO (KHÔNG DÙNG TRONG TEST VERCEL)
@@ -119,7 +121,15 @@ export default {
             "\\nNonce:", "${nonce}".substring(0,16) + "...",
             "\\nTime:", new Date().toLocaleTimeString("vi-VN"));
         </script>`;
-      html = html.replace("<head>", `<head>${metaTags}`);
+      if (html.includes("<head>")) {
+        html = html.replace("<head>", `<head>${metaTags}`);
+      } else if (html.includes("<html>")) {
+        html = html.replace("<html>", `<html>${metaTags}`);
+      } else if (html.includes("<body>")) {
+        html = html.replace("<body>", `${metaTags}<body>`);
+      } else {
+        html = `${metaTags}${html}`;
+      }
 
       // SECURITY HEADERS
       const newHeaders = new Headers(response.headers);
