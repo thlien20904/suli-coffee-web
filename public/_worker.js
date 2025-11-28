@@ -1,19 +1,19 @@
-// public/_worker.js – FINAL CLEAN: FIX EXTERNAL STYLES BLOCK + META NONCE/POLICY CHO HASH&NONCE TAB, NO CONSOLE TESTS
+// public/_worker.js – FINAL CLEAN WITH SAFE HEAD INJECTION
 export default {
   async fetch(request, env, ctx) {
     try {
-      // CORE FIX: FETCH TỪ ASSETS (NO RECURSIVE LOOP!)
+      // CORE FIX: FETCH FROM ASSETS (NO LOOP)
       const response = await env.ASSETS.fetch(request);
       const contentType = response.headers.get("content-type") || "";
 
-      // SKIP NON-HTML (JS/CSS/IMG/FAVICON/API OK, NO 503)
+      // Skip non-HTML files
       if (!contentType.includes("text/html")) {
         return response;
       }
 
       let html = await response.text();
 
-      // NONCE UNIQUE PER REQUEST (RANDOM 32 CHARS BASE64)
+      // NONCE UNIQUE PER REQUEST
       const nonce = btoa(
         String.fromCharCode(...crypto.getRandomValues(new Uint8Array(32)))
       )
@@ -23,24 +23,20 @@ export default {
       const scriptHashes = new Set();
       const styleHashes = new Set();
 
-      // HASH HELPER (SHA-256 CHO INLINE CONTENT)
+      // HASH HELPER
       const addHash = async (content, set) => {
         if (!content.trim()) return;
-        try {
-          const encoder = new TextEncoder();
-          const hashBuffer = await crypto.subtle.digest(
-            "SHA-256",
-            encoder.encode(content.trim())
-          );
-          const hashArray = Array.from(new Uint8Array(hashBuffer));
-          const hashB64 = btoa(String.fromCharCode(...hashArray));
-          set.add(`'sha256-${hashB64}'`);
-        } catch (e) {
-          console.error("Hash error:", e);
-        }
+        const encoder = new TextEncoder();
+        const hashBuffer = await crypto.subtle.digest(
+          "SHA-256",
+          encoder.encode(content.trim())
+        );
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashB64 = btoa(String.fromCharCode(...hashArray));
+        set.add(`'sha256-${hashB64}'`);
       };
 
-      // ASYNC INJECT SCRIPTS: NONCE + HASH (CHẶN INLINE JS ĐỘNG)
+      // SCRIPT → inject nonce + hash
       const scriptPromises = [];
       html = html.replace(
         /<script([^>]*)>([\s\S]*?)<\/script>/gi,
@@ -55,13 +51,13 @@ export default {
       );
       await Promise.all(scriptPromises);
 
-      // ASYNC INJECT STYLES: CHỈ HASH (KHÔNG NONCE, CHO UNSAFE-INLINE DYNAMIC)
+      // STYLE → hash only
       const stylePromises = [];
       html = html.replace(
         /<style([^>]*)>([\s\S]*?)<\/style>/gi,
         (match, attrs, content) => {
           if (attrs.includes("nonce=")) return match;
-          const newTag = `<style${attrs}>${content}</style>`; // BỎ NONCE CHO STYLE
+          const newTag = `<style${attrs}>${content}</style>`;
           if (content.trim()) {
             stylePromises.push(addHash(content, styleHashes));
           }
@@ -70,16 +66,16 @@ export default {
       );
       await Promise.all(stylePromises);
 
-      // CSP POLICY: SCRIPT CHẶT (NONCE + HASH), STYLE MỞ RỘNG (UNSAFE-INLINE + EXTERNAL CDN/FONTS + HASH)
+      // CSP POLICY
       const csp = [
         "default-src 'self' blob: data:",
         `script-src 'self' 'nonce-${nonce}' ${[...scriptHashes].join(" ")}`,
         `style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com ${[
           ...styleHashes,
-        ].join(" ")}`, // FIX: ALLOW EXTERNAL STYLES (FONT-AWESOME, GOOGLE FONTS), GIỮ UNSAFE-INLINE CHO DYNAMIC (REACT/SWEETALERT)
+        ].join(" ")}`,
         "img-src * data: blob: https:",
-        "font-src * data: https://fonts.gstatic.com", // ALLOW FONTS.GOOGLEAPIS.COM FONTS
-        "connect-src *", // API/RENDER/SOCKET.IO (KHÔNG DÙNG TRONG TEST VERCEL)
+        "font-src * data: https://fonts.gstatic.com",
+        "connect-src *",
         "media-src * blob:",
         "object-src 'none'",
         "base-uri 'self'",
@@ -89,7 +85,7 @@ export default {
         "block-all-mixed-content",
       ].join("; ");
 
-      // INJECT META TAGS + CSP VIOLATION LISTENER (CHẠY TRƯỚC REACT MOUNT)
+      // META + CSP LISTENER
       const metaTags = `
         <meta name="csp-nonce" content="${nonce}">
         <meta name="csp-policy" content="${csp}">
@@ -97,8 +93,7 @@ export default {
           window.__CSP_NONCE__ = "${nonce}";
           window.cspViolations = window.cspViolations || [];
           window.cspPasses = window.cspPasses || [];
-          
-          // Lắng nghe CSP violations ngay khi page load
+
           document.addEventListener("securitypolicyviolation", function(e) {
             const violation = {
               id: "violation-" + Date.now() + "-" + Math.random(),
@@ -111,23 +106,25 @@ export default {
               status: "fail"
             };
             window.cspViolations.unshift(violation);
-            console.log("🔴 CSP Violation (from worker listener):", violation);
-            
-            // Dispatch custom event để React Provider nhận được
+            console.log("🔴 CSP Violation (from worker):", violation);
             window.dispatchEvent(new CustomEvent("csp-violation-detected", { detail: violation }));
           });
-          
-          console.log("%c✅ CSP Worker Active", "background:#00aa00;color:white;font-size:14px;padding:4px 8px;", 
+
+          console.log("%c✅ CSP Worker Active", "background:#00aa00;color:white;font-size:14px;padding:4px 8px;",
             "\\nNonce:", "${nonce}".substring(0,16) + "...",
             "\\nTime:", new Date().toLocaleTimeString("vi-VN"));
-        </script>`;
+        </script>
+      `;
+
+      // ✔ SAFE INJECTION LOGIC — NEW
       if (html.includes("<head>")) {
+        // Normal case
         html = html.replace("<head>", `<head>${metaTags}`);
-      } else if (html.includes("<html>")) {
-        html = html.replace("<html>", `<html>${metaTags}`);
-      } else if (html.includes("<body>")) {
-        html = html.replace("<body>", `${metaTags}<body>`);
+      } else if (html.match(/<html[^>]*>/i)) {
+        // No head → inject after <html>
+        html = html.replace(/<html([^>]*)>/i, `<html$1>${metaTags}`);
       } else {
+        // Worst case → prepend document
         html = `${metaTags}${html}`;
       }
 
@@ -143,10 +140,11 @@ export default {
         statusText: response.statusText,
         headers: newHeaders,
       });
+
     } catch (error) {
       console.error("Worker error:", error);
       return new Response(
-        `CSP Worker Error: ${error.message}. Check Vercel/Cloudflare Functions logs.`,
+        `CSP Worker Error: ${error.message}`,
         { status: 500 }
       );
     }
