@@ -1,7 +1,7 @@
 // frontend/src/App.js
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { login } from "./redux/userSlice";
 import { jwtDecode } from "jwt-decode";
 
@@ -34,8 +34,7 @@ import Vouchers from "./pages/user/profile/Vouchers";
 import Notifications from "./pages/user/profile/Notifications";
 import Help from "./pages/user/profile/Help";
 import OrderDetail from "./pages/user/profile/OrderDetail";
-import ReturnOrder from "./pages/user/profile/ReturnOrder"; // ✅ THÊM: Trang trả hàng
-//import ReviewPopup from "./components/user/profile/ReviewPopup";
+import ReturnOrder from "./pages/user/profile/ReturnOrder";
 
 import Stores from "./pages/user/StoresUser";
 import VnpayReturn from "./pages/user/VnpayReturn";
@@ -73,15 +72,37 @@ import BestsellerReport from "./pages/admin/report/bestseller";
 import UserLayout from "./components/layout/user/UserLayout";
 import AdminLayout from "./components/layout/admin/AdminLayout";
 
-// PrivateRoute
+// ============== PROTECTED ROUTES ==============
+
+// 1. Route chỉ cần đăng nhập
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/login" />;
+  return token ? children : <Navigate to="/login" replace />;
 }
 
+// 2. Route chỉ ADMIN mới được vào
+function AdminRoute({ children }) {
+  const token = localStorage.getItem("token");
+  if (!token) return <Navigate to="/login" replace />;
+
+  try {
+    const decoded = jwtDecode(token);
+    if (decoded.role === "admin") {
+      return children;
+    }
+    // Nếu không phải admin → đẩy về trang chủ
+    return <Navigate to="/" replace />;
+  } catch (err) {
+    localStorage.removeItem("token");
+    return <Navigate to="/login" replace />;
+  }
+}
+
+// ============== APP COMPONENT ==============
 function App() {
   const dispatch = useDispatch();
 
+  // Auto login nếu có token hợp lệ
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -110,10 +131,45 @@ function App() {
 
   return (
     <CSPProvider>
-       <ChatBot />
+      <ChatBot />
       <Routes>
-        {/* CSP Dashboard route */}
-        <Route path="/csp-dashboard" element={<CSPDashboard />} />
+        {/* CSP Dashboard - CHỈ ADMIN, chuyển vào /admin/csp-dashboard */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route
+            path="csp-dashboard"
+            element={
+              <AdminRoute>
+                <CSPDashboard />
+              </AdminRoute>
+            }
+          />
+          {/* ...existing code... */}
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="food" element={<Food />} />
+          <Route path="food/add" element={<AddFood />} />
+          <Route path="food/edit/:id" element={<EditFood />} />
+          <Route path="category" element={<Category />} />
+          <Route path="category/add" element={<CategoryAdd />} />
+          <Route path="category/edit/:id" element={<CategoryEdit />} />
+          <Route path="ingredient" element={<Ingredient />} />
+          <Route path="ingredient/add" element={<AddIngredient />} />
+          <Route path="ingredient/edit/:id" element={<EditIngredient />} />
+          <Route path="export" element={<ExportIngredient />} />
+          <Route path="payment" element={<Payment />} />
+          <Route path="payment/add" element={<AddPayment />} />
+          <Route path="payment/edit/:id" element={<EditPayment />} />
+          <Route path="users" element={<UserList />} />
+          <Route path="staff" element={<Staff />} />
+          <Route path="staff/add" element={<AddStaff />} />
+          <Route path="staff/edit/:id" element={<EditStaff />} />
+          <Route path="invoice" element={<Invoice />} />
+          <Route path="order" element={<Order />} />
+          <Route path="revenue" element={<RevenueReport />} />
+          <Route path="bestseller" element={<BestsellerReport />} />
+          <Route path="voucher" element={<Voucher />} />
+          <Route path="voucher/assign" element={<AssignVoucher />} />
+          <Route path="voucher/list" element={<VoucherList />} />
+        </Route>
 
         {/* Auth routes */}
         <Route path="/login" element={<Login />} />
@@ -153,11 +209,11 @@ function App() {
             }
           />
           <Route path="stores" element={<Stores />} />
-          <Route path="/vnpay-return" element={<VnpayReturn />} />
+          <Route path="vnpay-return" element={<VnpayReturn />} />
           <Route path="about" element={<About />} />
           <Route path="contact" element={<Contact />} />
 
-          {/* Profile nested routes - Giữ nguyên cấu trúc, chỉ thêm nested cho profile */}
+          {/* Profile nested routes */}
           <Route
             path="profile"
             element={
@@ -166,24 +222,27 @@ function App() {
               </PrivateRoute>
             }
           >
-            <Route index element={<ProfileInfo />} />{" "}
-            {/* /profile → ProfileInfo */}
+            <Route index element={<ProfileInfo />} />
             <Route path="orders">
               <Route index element={<OrdersList />} />
               <Route path="orderdetail/:orderId" element={<OrderDetail />} />
-              <Route path="return-order/:orderId" element={<ReturnOrder />} /> {/* ✅ THÊM: Trang trả hàng */}
-            </Route>{" "}
-            {/* /profile/orders */}
-            <Route path="vouchers" element={<Vouchers />} />{" "}
-            {/* /profile/vouchers */}
-            <Route path="notifications" element={<Notifications />} />{" "}
-            {/* /profile/notifications */}
-            <Route path="help" element={<Help />} /> {/* /profile/help */}
+              <Route path="return-order/:orderId" element={<ReturnOrder />} />
+            </Route>
+            <Route path="vouchers" element={<Vouchers />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="help" element={<Help />} />
           </Route>
         </Route>
 
-        {/* Admin routes */}
-        <Route path="/admin" element={<AdminLayout />}>
+        {/* ADMIN PANEL - TẤT CẢ CHỈ ADMIN VÀO ĐƯỢC */}
+        <Route
+          path="/admin"
+          element={
+            <AdminRoute>
+              <AdminLayout />
+            </AdminRoute>
+          }
+        >
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="food" element={<Food />} />
           <Route path="food/add" element={<AddFood />} />
@@ -210,6 +269,9 @@ function App() {
           <Route path="voucher/assign" element={<AssignVoucher />} />
           <Route path="voucher/list" element={<VoucherList />} />
         </Route>
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </CSPProvider>
   );
