@@ -151,7 +151,9 @@ export default function Notifications() {
                   <div className="title-row">
                     <strong className="title">{n.Title}</strong>
                     <span className="time">
-                      {new Date(n.CreatedAt).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
+                      {new Date(n.CreatedAt).toLocaleString("vi-VN", {
+                        timeZone: "Asia/Ho_Chi_Minh",
+                      })}
                     </span>
                   </div>
                   <p className="message">{n.Message}</p>

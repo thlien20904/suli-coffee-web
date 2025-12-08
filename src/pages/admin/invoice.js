@@ -162,15 +162,17 @@ const Invoice = () => {
               <tr key={item.OrderId}>
                 <td>{item.OrderId}</td>
                 <td>{item.User?.FullName || "N/A"}</td>
-                <td>{new Date(item.OrderDate).toLocaleString("vi-VN", {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                  second: "2-digit",
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                  timeZone: "Asia/Ho_Chi_Minh",
-                })}</td>
+                <td>
+                  {new Date(item.OrderDate).toLocaleString("vi-VN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    timeZone: "Asia/Ho_Chi_Minh",
+                  })}
+                </td>
                 <td>{item.PaymentMethod?.TenPhuongThuc || "N/A"}</td>
                 <td>{item.Status?.StatusName || "N/A"}</td>
 

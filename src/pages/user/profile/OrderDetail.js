@@ -111,7 +111,9 @@ export default function OrderDetail() {
         <div className="row mb-3">
           <div className="col-md-6">
             <strong>Ngày đặt hàng:</strong>{" "}
-            {new Date(order.OrderDate).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
+            {new Date(order.OrderDate).toLocaleString("vi-VN", {
+              timeZone: "Asia/Ho_Chi_Minh",
+            })}
           </div>
           <div className="col-md-6">
             <strong>Phương thức thanh toán:</strong> {paymentMethodName}

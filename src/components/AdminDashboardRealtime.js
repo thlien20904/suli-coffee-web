@@ -140,7 +140,9 @@ const AdminDashboardRealtime = () => {
                     </span>
                   </td>
                   <td className="order-time">
-                    {new Date(order.timestamp).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}
+                    {new Date(order.timestamp).toLocaleString("vi-VN", {
+                      timeZone: "Asia/Ho_Chi_Minh",
+                    })}
                   </td>
                 </tr>
               ))}

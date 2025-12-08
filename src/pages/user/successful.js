@@ -157,7 +157,9 @@ export default function Successful() {
           </p>
           <p>
             <strong>Ngày đặt:</strong>{" "}
-            {new Date(orderDate || new Date()).toLocaleString("vi-VN")}
+            {new Date(orderDate || new Date()).toLocaleString("vi-VN", {
+              timeZone: "Asia/Ho_Chi_Minh",
+            })}
           </p>
           <p>
             <strong>Tổng tiền:</strong>{" "}
