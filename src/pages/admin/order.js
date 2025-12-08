@@ -7,6 +7,7 @@ import "../../styles/components/admin/order.css";
 
 const Order = () => {
   const tabs = [
+    { id: "don-luu-tam", name: "Đơn lưu tạm", statusId: 6 },
     { id: "cho-xac-nhan", name: "Chờ xác nhận", statusId: 1 },
     { id: "dang-chuan-bi", name: "Đang chuẩn bị", statusId: 2 },
     { id: "dang-giao-hang", name: "Đang giao hàng", statusId: 3 },
@@ -96,6 +97,57 @@ const Order = () => {
     }
   };
 
+  // -------------------- HỦY ĐỠN LƯU TẠM --------------------
+  const cancelPendingOrder = async (orderId) => {
+    const result = await Swal.fire({
+      title: "Xác nhận hủy đơn lưu tạm?",
+      text: "Đơn hàng này sẽ bị hủy và không thể khôi phục!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Có, hủy ngay!",
+      cancelButtonText: "Không",
+      reverseButtons: true,
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post(
+        buildApiUrl(`/api/admin/orders/pending/${orderId}/cancel`),
+        {},
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      if (res.data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Thành công!",
+          text: "Đơn hàng đã được hủy.",
+          showConfirmButton: true,
+          timer: 1500,
+        }).then(() => {
+          fetchOrders(activeTab, ordersData[activeTab]?.currentPage || 1);
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Lỗi!",
+          text: res.data.message || "Hủy thất bại",
+          showConfirmButton: true,
+        });
+      }
+    } catch (err) {
+      console.error("❌ CANCEL PENDING ORDER ERROR:", err);
+      Swal.fire({
+        icon: "error",
+        title: "Lỗi!",
+        text: err.response?.data?.message || "Không thể kết nối server!",
+        showConfirmButton: true,
+      });
+    }
+  };
+
   // -------------------- RENDER BẢNG --------------------
   const renderTable = (tab) => {
     const data = ordersData[tab];
@@ -121,6 +173,7 @@ const Order = () => {
               <th>Ngày đặt</th>
               <th>Tổng tiền</th>
               <th>Thanh toán</th>
+              <th>Trạng thái đơn hàng</th>
               <th>Trạng thái TT</th>
               <th>Chi tiết</th>
               <th>Hành động</th>
@@ -133,11 +186,17 @@ const Order = () => {
                 <td>{o.User?.FullName || "Khách vãng lai"}</td>
                 <td>
                   {new Date(o.OrderDate).toLocaleString("vi-VN", {
-                    hour12: true,
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
                   })}
                 </td>
                 <td>{o.TotalAmount?.toLocaleString("vi-VN")} ₫</td>
                 <td>{o.PaymentMethod || "N/A"}</td>
+                <td>{o.Status || "Không xác định"}</td>
                 <td>
                   <span
                     className={
@@ -176,7 +235,14 @@ const Order = () => {
                   )}
                 </td>
                 <td>
-                  {o.StatusId === 5 ? (
+                  {o.StatusId === 6 ? (
+                    <button
+                      className="btn btn-sm btn-danger"
+                      onClick={() => cancelPendingOrder(o.OrderId)}
+                    >
+                      <i className="fas fa-times"></i> Hủy đơn
+                    </button>
+                  ) : o.StatusId === 5 ? (
                     <span className="badge bg-danger">Đã hủy</span>
                   ) : o.PaymentStatusId === 3 ? (
                     <span className="badge bg-warning text-dark">

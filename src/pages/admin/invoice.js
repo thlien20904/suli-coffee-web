@@ -225,7 +225,16 @@ const Invoice = () => {
             <div className="invoice-print">
               <h2 className="brand-title">SULI COFFEE HOUSE</h2>
               <p className="brand-address">
-                234 Hoàng Quốc Việt, Bắc Từ Liêm, Hà Nội
+                {currentInvoice?.CuaHang?.Address || "234 Hoàng Quốc Việt"}
+                {currentInvoice?.CuaHang?.Ward &&
+                  `, ${currentInvoice.CuaHang.Ward}`}
+                {currentInvoice?.CuaHang?.District &&
+                  `, ${currentInvoice.CuaHang.District}`}
+                {currentInvoice?.CuaHang?.Province &&
+                  `, ${currentInvoice.CuaHang.Province}`}
+              </p>
+              <p className="brand-address">
+                SĐT: {currentInvoice?.CuaHang?.Phone || "086868686"}
               </p>
               <hr />
 
@@ -234,20 +243,52 @@ const Invoice = () => {
                   <b>Số HĐ:</b> {currentInvoice?.OrderId}
                 </p>
                 <p>
-                  <b>Ngày:</b>{" "}
-                  {new Date(currentInvoice?.OrderDate).toLocaleString()}
+                  <b>Ngày đặt:</b>{" "}
+                  {new Date(currentInvoice?.OrderDate).toLocaleString("vi-VN", {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                    second: "2-digit",
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                  })}
                 </p>
                 <p>
-                  <b>Khách hàng:</b> {currentInvoice?.User?.FullName || "N/A"}
+                  <b>Khách hàng:</b>{" "}
+                  {currentInvoice?.ReceiverName ||
+                    currentInvoice?.User?.FullName ||
+                    "N/A"}
                 </p>
                 <p>
-                  <b>Phương thức:</b>{" "}
+                  <b>Số điện thoại:</b> {currentInvoice?.Phone || "N/A"}
+                </p>
+                {currentInvoice?.Address && (
+                  <p>
+                    <b>Địa chỉ giao hàng:</b> {currentInvoice.Address}
+                    {currentInvoice.Ward && `, ${currentInvoice.Ward}`}
+                    {currentInvoice.District && `, ${currentInvoice.District}`}
+                    {currentInvoice.Province && `, ${currentInvoice.Province}`}
+                  </p>
+                )}
+                <p>
+                  <b>Phương thức thanh toán:</b>{" "}
                   {currentInvoice?.PaymentMethod?.TenPhuongThuc || "N/A"}
                 </p>
                 <p>
-                  <b>Trạng thái:</b>{" "}
+                  <b>Trạng thái đơn hàng:</b>{" "}
                   {currentInvoice?.Status?.StatusName || "N/A"}
                 </p>
+                <p>
+                  <b>Trạng thái thanh toán:</b>{" "}
+                  {currentInvoice?.PaymentStatus?.PaymentStatusName || "N/A"}
+                </p>
+                {currentInvoice?.Voucher && (
+                  <p>
+                    <b>Mã giảm giá:</b> {currentInvoice.Voucher.Code}
+                    {currentInvoice.Voucher.DiscountPercentage &&
+                      ` (-${currentInvoice.Voucher.DiscountPercentage}%)`}
+                  </p>
+                )}
               </div>
 
               <table className="invoice-detail-table">
@@ -255,6 +296,7 @@ const Invoice = () => {
                   <tr>
                     <th>TT</th>
                     <th>Tên món</th>
+                    <th>Chi tiết</th>
                     <th>SL</th>
                     <th>Đ.Giá</th>
                     <th>T.Tiền</th>
@@ -262,18 +304,20 @@ const Invoice = () => {
                 </thead>
                 <tbody>
                   {details.map((d, i) => (
-                    <tr key={d.OrderDetailId}>
+                    <tr key={d.OrderDetailId || i}>
                       <td>{i + 1}</td>
+                      <td>{d.FoodName || "N/A"}</td>
                       <td>
-                        {d.Food?.FoodName || "N/A"}
-                        {d.Size?.SizeName ? ` (${d.Size.SizeName})` : ""}
-                        {d.Topping?.ToppingName
-                          ? ` - ${d.Topping.ToppingName}`
-                          : ""}
+                        {d.SizeName && `Kích cỡ: ${d.SizeName}`}
+                        <br />
+                        {d.Toppings && d.Toppings.length > 0 && (
+                          <small className="text-muted">
+                            Topping:{" "}
+                            {d.Toppings.map((t) => t.ToppingName).join(", ")}
+                          </small>
+                        )}
                       </td>
                       <td>{d.Quantity}</td>
-
-                      {/* 🔥 FIX TIỀN */}
                       <td>
                         {Math.round(d.Price || 0).toLocaleString("vi-VN")} ₫
                       </td>
@@ -293,31 +337,39 @@ const Invoice = () => {
                   <b>Tổng số lượng:</b>{" "}
                   {details.reduce((sum, d) => sum + (d.Quantity || 0), 0)}
                 </p>
-
-                {/* 🔥 FIX TIỀN */}
                 <p>
-                  <b>Thành tiền:</b>{" "}
-                  {Math.round(currentInvoice?.TotalAmount || 0).toLocaleString(
+                  <b>Tạm tính:</b>{" "}
+                  {(
+                    currentInvoice?.Subtotal ||
+                    details.reduce(
+                      (sum, d) => sum + (d.Quantity || 0) * (d.Price || 0),
+                      0
+                    )
+                  ).toLocaleString("vi-VN")}{" "}
+                  ₫
+                </p>
+                <p>
+                  <b>Phí ship:</b>{" "}
+                  {Math.round(currentInvoice?.ShippingFee || 0).toLocaleString(
                     "vi-VN"
                   )}{" "}
                   ₫
                 </p>
-                <p>
-                  <b>Thanh toán:</b>{" "}
+                {currentInvoice?.DiscountAmount > 0 && (
+                  <p className="text-success">
+                    <b>Giảm giá:</b> -
+                    {Math.round(
+                      currentInvoice?.DiscountAmount || 0
+                    ).toLocaleString("vi-VN")}{" "}
+                    ₫
+                  </p>
+                )}
+                <p style={{ fontSize: "1.2em", fontWeight: "bold" }}>
+                  <b>Tổng cộng:</b>{" "}
                   {Math.round(currentInvoice?.TotalAmount || 0).toLocaleString(
                     "vi-VN"
                   )}{" "}
                   ₫
-                </p>
-                <p>
-                  <b>Tiền khách đưa:</b>{" "}
-                  {Math.round(currentInvoice?.TotalAmount || 0).toLocaleString(
-                    "vi-VN"
-                  )}{" "}
-                  ₫
-                </p>
-                <p>
-                  <b>Tiền thừa:</b> 0 ₫
                 </p>
               </div>
 

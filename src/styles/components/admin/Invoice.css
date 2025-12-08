@@ -190,9 +190,10 @@
   display: flex;
   align-items: flex-start;
   justify-content: center;
-  padding-top: 100px;
-  z-index: 9000;
+  padding: 20px;
+  z-index: 9999;
   color: #000;
+  overflow-y: auto;
 }
 
 /* ==================== INVOICE MODAL ==================== */
@@ -205,18 +206,21 @@
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
   width: 40%;
   max-width: 700px;
-  max-height: 90vh;
+  max-height: calc(100vh - 100px);
   overflow-y: auto;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
   border-radius: 12px;
   animation: fadeInScale 0.3s ease;
   position: relative;
-  z-index: 9100;
+  z-index: 10000;
+  margin-top: 70px;
+  margin-bottom: 20px;
+  /* Ẩn scrollbar nhưng vẫn cho scroll */
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
 }
 
 .invoice-modal::-webkit-scrollbar {
-  display: none;
+  display: none; /* Chrome, Safari, Opera */
 }
 
 @keyframes fadeInScale {
@@ -346,6 +350,7 @@
   gap: 12px;
 }
 
+
 /* ==================== PRINT STYLES ==================== */
 @media print {
   body * {
@@ -427,6 +432,40 @@
 
   @page {
     margin: 10mm;
+  }
+}
+
+/* ==================== RESPONSIVE ==================== */
+@media (max-width: 768px) {
+  .invoice-table {
+    font-size: 0.85rem;
+  }
+
+  .invoice-table th,
+  .invoice-table td {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .invoice-filter {
+    gap: 8px;
+  }
+
+  .search-box,
+  .date-group input,
+  .invoice-filter select {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .pagination button {
+    min-width: 35px;
+    height: 35px;
+    font-size: 0.875rem;
+  }
+
+  .invoice-modal {
+    width: 95%;
+    padding: 20px;
   }
 }
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import { buildApiUrl } from "../../../utils/apiConfig";
 import Swal from "sweetalert2";
-import ReviewPopup from "./ReviewPopup";           // Đánh giá / Sửa
+import ReviewPopup from "./ReviewPopup"; // Đánh giá / Sửa
 import ReviewDetailPopup from "./ReviewDetailPopup"; // Xem đánh giá + nút Sửa
 import "../../../styles/pages/orderslist.css";
 
@@ -22,14 +22,14 @@ export default function OrdersList() {
   const [loadingTabs, setLoadingTabs] = useState({});
 
   // Popup states
-  const [showReviewPopup, setShowReviewPopup] = useState(null);     // orderId
-  const [showReviewDetail, setShowReviewDetail] = useState(null);   // orderId
+  const [showReviewPopup, setShowReviewPopup] = useState(null); // orderId
+  const [showReviewDetail, setShowReviewDetail] = useState(null); // orderId
 
   const navigate = useNavigate();
 
   // ==================== LẤY ĐƠN HÀNG ====================
   const fetchOrders = async (tab, page = 1) => {
-    setLoadingTabs(prev => ({ ...prev, [tab]: true }));
+    setLoadingTabs((prev) => ({ ...prev, [tab]: true }));
 
     try {
       const token = localStorage.getItem("token");
@@ -69,7 +69,7 @@ export default function OrdersList() {
           })
         );
 
-        setOrdersData(prev => ({
+        setOrdersData((prev) => ({
           ...prev,
           [tab]: {
             orders: enrichedOrders,
@@ -78,16 +78,16 @@ export default function OrdersList() {
           },
         }));
       } else {
-        setOrdersData(prev => ({
+        setOrdersData((prev) => ({
           ...prev,
           [tab]: { orders: [], currentPage: 1, totalPages: 1 },
         }));
       }
     } catch (err) {
       console.error("Fetch error:", err);
-      setOrdersData(prev => ({ ...prev, [tab]: { orders: [] } }));
+      setOrdersData((prev) => ({ ...prev, [tab]: { orders: [] } }));
     } finally {
-      setLoadingTabs(prev => ({ ...prev, [tab]: false }));
+      setLoadingTabs((prev) => ({ ...prev, [tab]: false }));
     }
   };
 
@@ -112,17 +112,29 @@ export default function OrdersList() {
 
     try {
       const token = localStorage.getItem("token");
-      
+
       // Chọn API tùy theo loại đơn
-      const apiUrl = orderType === "pending"
-        ? `/api/orders/pending/${orderId}/cancel`
-        : "/api/profile/orders/cancel";
-      
+      const apiUrl =
+        orderType === "pending"
+          ? `/api/orders/pending/${orderId}/cancel`
+          : "/api/profile/orders/cancel";
+
+      // ✅ Log request details
+      console.log("📤 CANCEL REQUEST:", {
+        orderType,
+        orderId,
+        apiUrl,
+        fullUrl: buildApiUrl(apiUrl),
+        hasToken: !!token,
+      });
+
       const res = await axios.post(
         buildApiUrl(apiUrl),
         orderType === "pending" ? {} : { orderId }, // pending không cần body
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
+      console.log("✅ CANCEL RESPONSE:", res.data);
 
       if (res.data.success) {
         Swal.fire({
@@ -132,7 +144,7 @@ export default function OrdersList() {
           showConfirmButton: true,
           timer: 1000,
         }).then(() => {
-          setOrdersData(prev => {
+          setOrdersData((prev) => {
             const newData = { ...prev };
 
             // 1️⃣ Loại bỏ khỏi pending nếu có
@@ -171,11 +183,29 @@ export default function OrdersList() {
         });
       }
     } catch (err) {
-      console.error("CANCEL ORDER ERROR:", err);
+      // ✅ Log chi tiết error
+      console.error("❌ CANCEL ORDER ERROR:", {
+        message: err.message,
+        status: err.response?.status,
+        statusText: err.response?.statusText,
+        data: err.response?.data,
+        config: {
+          url: err.config?.url,
+          method: err.config?.method,
+          headers: err.config?.headers,
+        },
+        fullError: err,
+      });
+
+      const errorMessage =
+        err.response?.data?.message ||
+        err.message ||
+        "Không thể kết nối server!";
+
       Swal.fire({
         icon: "error",
         title: "Lỗi!",
-        text: "Không thể kết nối server!",
+        text: errorMessage,
         showConfirmButton: true,
       });
     }
@@ -202,19 +232,26 @@ export default function OrdersList() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setOrdersData(prev => {
+      setOrdersData((prev) => {
         const newData = { ...prev };
         let movedOrder = null;
 
         if (newData["dang-giao-hang"]?.orders) {
-          const idx = newData["dang-giao-hang"].orders.findIndex(o => o.OrderId === orderId);
-          if (idx !== - 1) {
-            movedOrder = { ...newData["dang-giao-hang"].orders[idx], StatusId: 4, Status: "Giao hàng thành công" };
+          const idx = newData["dang-giao-hang"].orders.findIndex(
+            (o) => o.OrderId === orderId
+          );
+          if (idx !== -1) {
+            movedOrder = {
+              ...newData["dang-giao-hang"].orders[idx],
+              StatusId: 4,
+              Status: "Giao hàng thành công",
+            };
             newData["dang-giao-hang"].orders.splice(idx, 1);
           }
         }
 
-        if (!newData["da-giao"]) newData["da-giao"] = { orders: [], currentPage: 1, totalPages: 1 };
+        if (!newData["da-giao"])
+          newData["da-giao"] = { orders: [], currentPage: 1, totalPages: 1 };
         if (movedOrder) newData["da-giao"].orders.unshift(movedOrder);
 
         return newData;
