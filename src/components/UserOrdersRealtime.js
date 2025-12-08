@@ -85,7 +85,8 @@ const UserOrdersRealtime = ({ userId, initialOrders = [] }) => {
                 <div className="order-time">
                   🕐{" "}
                   {new Date(order.timestamp || order.orderDate).toLocaleString(
-                    "vi-VN"
+                    "vi-VN",
+                    { timeZone: "Asia/Ho_Chi_Minh" }
                   )}
                 </div>
               </div>

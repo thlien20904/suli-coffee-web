@@ -332,7 +332,7 @@ export default function OrdersList() {
                 style={{ cursor: "pointer" }}
               >
                 <td>#{o.OrderId}</td>
-                <td>{new Date(o.OrderDate).toLocaleString("vi-VN")}</td>
+                <td>{new Date(o.OrderDate).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}</td>
                 <td>{o.TotalAmount.toLocaleString("vi-VN")} ₫</td>
                 <td>{o.PaymentMethod || "N/A"}</td>
                 <td>{o.Status}</td>

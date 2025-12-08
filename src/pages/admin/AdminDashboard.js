@@ -399,7 +399,7 @@ const AdminDashboard = () => {
                     <td>{o.OrderId}</td>
                     <td>{o.FullName}</td>
                     <td>{o.StatusName}</td>
-                    <td>{new Date(o.OrderDate).toLocaleString()}</td>
+                    <td>{new Date(o.OrderDate).toLocaleString("vi-VN", { timeZone: "Asia/Ho_Chi_Minh" })}</td>
                     <td>
                       {Math.round(o.TotalAmount).toLocaleString("vi-VN")}₫
                     </td>
