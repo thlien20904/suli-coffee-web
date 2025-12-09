@@ -279,6 +279,32 @@ export default function CheckoutForm({
           background: #fff;
           border-radius: 8px;
         }
+        
+        .dropdown-menu {
+          max-height: 300px;
+          overflow-y: auto;
+          min-width: 350px;
+          scrollbar-width: none; /* Firefox */
+          -ms-overflow-style: none; /* IE and Edge */
+        }
+        
+        .dropdown-menu::-webkit-scrollbar {
+          display: none; /* Chrome, Safari, Opera */
+        }
+        
+        .dropdown-item {
+          white-space: normal;
+          word-wrap: break-word;
+          padding: 12px 16px;
+          min-height: 50px;
+          display: flex;
+          align-items: center;
+          line-height: 1.4;
+        }
+        
+        .dropdown-item:hover {
+          background-color: #f8f9fa;
+        }
       `}</style>
     </div>
   );

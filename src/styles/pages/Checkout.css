@@ -282,6 +282,12 @@
   transition: all 0.2s ease;
   border-bottom: 1px solid #f0f0f0;
   color: #495057;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
 }
 
 .voucher-dropdown .voucher-item:last-child {
@@ -292,6 +298,9 @@
   background: linear-gradient(90deg, #f8f9fa 0%, #e9ecef 50%, #f8f9fa 100%);
   color: #667eea;
   padding-left: 20px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 
 /* ==================== ADDITIONAL STYLES ==================== */

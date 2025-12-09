@@ -133,44 +133,6 @@ function App() {
     <CSPProvider>
       <ChatBot />
       <Routes>
-        {/* CSP Dashboard - CHỈ ADMIN, chuyển vào /admin/csp-dashboard */}
-        <Route path="/admin" element={<AdminLayout />}>
-          <Route
-            path="csp-dashboard"
-            element={
-              <AdminRoute>
-                <CSPDashboard />
-              </AdminRoute>
-            }
-          />
-          {/* ...existing code... */}
-          <Route path="dashboard" element={<AdminDashboard />} />
-          <Route path="food" element={<Food />} />
-          <Route path="food/add" element={<AddFood />} />
-          <Route path="food/edit/:id" element={<EditFood />} />
-          <Route path="category" element={<Category />} />
-          <Route path="category/add" element={<CategoryAdd />} />
-          <Route path="category/edit/:id" element={<CategoryEdit />} />
-          <Route path="ingredient" element={<Ingredient />} />
-          <Route path="ingredient/add" element={<AddIngredient />} />
-          <Route path="ingredient/edit/:id" element={<EditIngredient />} />
-          <Route path="export" element={<ExportIngredient />} />
-          <Route path="payment" element={<Payment />} />
-          <Route path="payment/add" element={<AddPayment />} />
-          <Route path="payment/edit/:id" element={<EditPayment />} />
-          <Route path="users" element={<UserList />} />
-          <Route path="staff" element={<Staff />} />
-          <Route path="staff/add" element={<AddStaff />} />
-          <Route path="staff/edit/:id" element={<EditStaff />} />
-          <Route path="invoice" element={<Invoice />} />
-          <Route path="order" element={<Order />} />
-          <Route path="revenue" element={<RevenueReport />} />
-          <Route path="bestseller" element={<BestsellerReport />} />
-          <Route path="voucher" element={<Voucher />} />
-          <Route path="voucher/assign" element={<AssignVoucher />} />
-          <Route path="voucher/list" element={<VoucherList />} />
-        </Route>
-
         {/* Auth routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
@@ -243,6 +205,7 @@ function App() {
             </AdminRoute>
           }
         >
+          <Route path="csp-dashboard" element={<CSPDashboard />} />
           <Route path="dashboard" element={<AdminDashboard />} />
           <Route path="food" element={<Food />} />
           <Route path="food/add" element={<AddFood />} />
